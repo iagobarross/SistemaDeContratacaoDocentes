@@ -129,6 +129,7 @@ public class Tela extends JFrame {
 		disciplinas.add(scrollPane);
 		
 		JTextArea taDisciplina = new JTextArea();
+		taDisciplina.setFont(new Font("Monospaced", Font.PLAIN, 12));
 		scrollPane.setViewportView(taDisciplina);
 		
 		JLabel lblDisciplinaCodigoCurso = new JLabel("Código do Curso");
