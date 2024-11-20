@@ -68,7 +68,6 @@ public class DisciplinaController implements ActionListener {
 	}
 
 	private void cadastrarDisciplina() throws Exception {
-		
 		Disciplina disciplina = new Disciplina();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
@@ -90,7 +89,6 @@ public class DisciplinaController implements ActionListener {
 	}
 
 	private void insertDisc(String csvDisciplina) throws IOException {
-		
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File dir = new File(path);
 
@@ -124,7 +122,7 @@ public class DisciplinaController implements ActionListener {
 		if (!disciplina.getNomeDisciplina().isBlank()) {
 			disciplina = searchName(disciplina);
 		} else if (!disciplina.getCodigoDisciplina().isBlank()) {
-			disciplina = searchCodeDisc(disciplina);
+			discFound = searchCodeDisc(disciplina);
 		} else if (!disciplina.getCodigoCurso().isBlank()) {
 			discFound = searchCodeCourse(disciplina);
 		} else {
@@ -133,9 +131,10 @@ public class DisciplinaController implements ActionListener {
 		}
 
 		if (disciplina != null) {
-			taDisciplina.setText(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n%-30s %-20s %-15s %-14s %-15s %-15s","Nome","Cód. da Disciplina","Dia da Semana",
-					"Hora Inicial","Horas Diárias","Cód. do Curso",disciplina.getNomeDisciplina() ,disciplina.getCodigoDisciplina(),
-					disciplina.getDiaSemana(), disciplina.getHoraInicial(), disciplina.getHorasDiarias(),disciplina.getCodigoCurso() ));
+			taDisciplina.setText("Cód. Disciplina: " + disciplina.getCodigoDisciplina() + " Nome: "
+					+ disciplina.getNomeDisciplina() + " Dia da Semana: " + disciplina.getDiaSemana()
+					+ " Hora Inicial: " + disciplina.getHoraInicial() + " Total de Horas Diárias: "
+					+ disciplina.getHorasDiarias() + " Cód. Curso: " + disciplina.getCodigoCurso());
 		} else {
 			taDisciplina.setText("Disciplina não encontrada");
 		}
