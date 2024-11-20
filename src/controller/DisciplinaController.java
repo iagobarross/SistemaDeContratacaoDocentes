@@ -122,7 +122,7 @@ public class DisciplinaController implements ActionListener {
 		if (!disciplina.getNomeDisciplina().isBlank()) {
 			disciplina = searchName(disciplina);
 		} else if (!disciplina.getCodigoDisciplina().isBlank()) {
-			discFound = searchCodeDisc(disciplina);
+			disciplina = searchCodeDisc(disciplina);
 		} else if (!disciplina.getCodigoCurso().isBlank()) {
 			discFound = searchCodeCourse(disciplina);
 		} else {
@@ -131,10 +131,9 @@ public class DisciplinaController implements ActionListener {
 		}
 
 		if (disciplina != null) {
-			taDisciplina.setText("Cód. Disciplina: " + disciplina.getCodigoDisciplina() + " Nome: "
-					+ disciplina.getNomeDisciplina() + " Dia da Semana: " + disciplina.getDiaSemana()
-					+ " Hora Inicial: " + disciplina.getHoraInicial() + " Total de Horas Diárias: "
-					+ disciplina.getHorasDiarias() + " Cód. Curso: " + disciplina.getCodigoCurso());
+			taDisciplina.setText(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n%-30s %-20s %-15s %-14s %-15s %-15s","Nome","Cód. da Disciplina","Dia da Semana",
+					"Hora Inicial","Horas Diárias","Cód. do Curso",disciplina.getNomeDisciplina() ,disciplina.getCodigoDisciplina(),
+					disciplina.getDiaSemana(), disciplina.getHoraInicial(), disciplina.getHorasDiarias(),disciplina.getCodigoCurso() ));
 		} else {
 			taDisciplina.setText("Disciplina não encontrada");
 		}
@@ -200,7 +199,7 @@ public class DisciplinaController implements ActionListener {
 			fis.close();
 		}
 
-		if (disciplina.getNomeDisciplina().equals("") ) {
+		if (disciplina.getNomeDisciplina().equals("")) {
 			return null;
 		}
 
