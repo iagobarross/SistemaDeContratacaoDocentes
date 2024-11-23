@@ -51,6 +51,8 @@ public class MetodosPrincipaisController {
 		}
 	}
 
+	
+	//ALTERAR CURSOADD PRA DEIXAR METODO GLOBAL
 	public <T> Lista<T> alimentarLista(String arquivoNome, Lista<T> listaDeItens) throws Exception{
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, arquivoNome);
@@ -72,7 +74,6 @@ public class MetodosPrincipaisController {
 			isr.close();
 			fis.close();
 		}
-		limparArquivo(arquivoNome);
 		return listaDeItens;
 	}
 }
