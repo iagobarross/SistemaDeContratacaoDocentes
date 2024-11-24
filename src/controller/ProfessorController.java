@@ -1,5 +1,10 @@
 package controller;
-
+/*  quando deleta após buscar da erro
+ * 	formatação errada com nomes curtos 
+ * 	
+ *  
+ *  
+ */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
