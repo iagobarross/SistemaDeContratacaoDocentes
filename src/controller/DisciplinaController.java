@@ -1,6 +1,5 @@
 package controller;
 
-
 /*     Se sobrar tempo adicionar cabeçalho na primeira gravação do CSV ( antes da criação )
  * 		Encurtar chamada de criação dos arquivos
  * 
@@ -19,14 +18,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import br.edu.fateczl.Lista;
 import br.edu.fateczl.Fila.Fila;
-import model.Curso;
 import model.Disciplina;
 
 public class DisciplinaController implements ActionListener {
@@ -37,14 +37,16 @@ public class DisciplinaController implements ActionListener {
 	private JTextField tfDisciplinaTotalHoras;
 	private JTextField tfDisciplinaCodigoCurso;
 	private JTextArea taDisciplina;
-	private int posicao= -1;
+	private JLabel lblDisciplinaModoAlteracao;
+	private JButton btnDisciplinaSalvarAlteracao;
+	private int posicao = -1;
 	Lista<Disciplina> listaDisciplinas = new Lista<>();
-	MetodosPrincipaisController metodosPrincipais=new MetodosPrincipaisController();
+	MetodosPrincipaisController metodosPrincipais = new MetodosPrincipaisController();
 //private static int codigoProcesso;
 
 	public DisciplinaController(JTextField tfDisciplinaCodigo, JTextField tfDisciplinaNome,
 			JComboBox<String> cbDisciplinaDiaSemana, JTextField tfDisciplinaHora, JTextField tfDisciplinaTotalHoras,
-			JTextField tfDisciplinaCodigoCurso, JTextArea taDisciplina) {
+			JTextField tfDisciplinaCodigoCurso, JTextArea taDisciplina, JLabel lblDisciplinaModoAlteracao, JButton btnDisciplinaSalvarAlteracao) {
 		this.tfDisciplinaCodigo = tfDisciplinaCodigo;
 		this.tfDisciplinaNome = tfDisciplinaNome;
 		this.cbDisciplinaDiaSemana = cbDisciplinaDiaSemana;
@@ -52,6 +54,8 @@ public class DisciplinaController implements ActionListener {
 		this.tfDisciplinaTotalHoras = tfDisciplinaTotalHoras;
 		this.tfDisciplinaCodigoCurso = tfDisciplinaCodigoCurso;
 		this.taDisciplina = taDisciplina;
+		this.lblDisciplinaModoAlteracao = lblDisciplinaModoAlteracao;
+		this.btnDisciplinaSalvarAlteracao = btnDisciplinaSalvarAlteracao;
 	}
 
 	@Override
@@ -59,6 +63,7 @@ public class DisciplinaController implements ActionListener {
 		String cmd = e.getActionCommand();
 		if (cmd.equals("Cadastrar")) {
 			try {
+				limparTADisciplina();
 				cadastrarDisciplina();
 			} catch (Exception e1) {
 				System.err.println(e1.getMessage());
@@ -68,21 +73,28 @@ public class DisciplinaController implements ActionListener {
 			try {
 				limparTADisciplina();
 				buscarDisciplina();
-				
+
 			} catch (Exception e1) {
 				System.err.println(e1.getMessage());
 			}
 		}
 		if (cmd.equals("Deletar")) {
-			deletarDisciplina();
+			try {
+				limparTADisciplina();
+				deletarDisciplina();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		if (cmd.equals("Limpar")) {
-			limparDisciplina();
+			limparTADisciplina();
+			limparCamposDisciplina();
 		}
 		if (cmd.equals("Listar")) {
 			try {
 				limparTADisciplina();
-				allCourses();
+				allDisciplines();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -90,14 +102,14 @@ public class DisciplinaController implements ActionListener {
 		if (cmd.equals("Atualizar")) {
 			try {
 				limparTADisciplina();
-				posicao = atualizarCurso();
+				posicao = atualizarDisciplina();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		}
 		if (cmd.equals("Salvar Alterações")) {
 			try {
-				limparDisciplina();
+				limparTADisciplina();
 				salvarAlteracoes(posicao);
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -105,22 +117,8 @@ public class DisciplinaController implements ActionListener {
 		}
 	}
 
-	private void limparTADisciplina() {
-		taDisciplina.setText("");
-	}
-
-	private void salvarAlteracoes(int posicao2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private int atualizarCurso() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	private void cadastrarDisciplina() throws Exception {
-	
+
 		Disciplina disciplina = new Disciplina();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
@@ -129,97 +127,110 @@ public class DisciplinaController implements ActionListener {
 		disciplina.setHoraInicial(tfDisciplinaHora.getText());
 		disciplina.setHorasDiarias(tfDisciplinaTotalHoras.getText());
 
-		listaDisciplinas.addLast(disciplina);
+		if (!disciplina.getDiaSemana().isEmpty() && !disciplina.getCodigoCurso().equals("")
+				&& !disciplina.getNomeDisciplina().equals("") && !disciplina.getCodigoDisciplina().equals("") && !disciplina.getHoraInicial().equals("") && !disciplina.getHorasDiarias().equals("")) {
+			listaDisciplinas.addLast(disciplina);
 
-		insertDisc(disciplina.toString());
-		tfDisciplinaNome.setText("");
-		tfDisciplinaCodigo.setText("");
-		tfDisciplinaCodigoCurso.setText("");
-		cbDisciplinaDiaSemana.setSelectedItem(null);
-		tfDisciplinaHora.setText("");
-		tfDisciplinaTotalHoras.setText("");
+			metodosPrincipais.inserirNoArquivo(disciplina.toString(), "Disciplinas.csv");
 
-	}
+			limparCamposDisciplina();
+			taDisciplina.setText("Disciplina adicionada!");
 
-	private void insertDisc(String csvDisciplina) throws IOException {
-		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-		File dir = new File(path);
-
-		if (!dir.exists()) {
-			dir.mkdir();
+		} else {
+			JOptionPane.showMessageDialog(null, "Todas as informações devem ser preenchidas para cadastrar um novo curso", "ERRO", JOptionPane.ERROR_MESSAGE);
 		}
-
-		File arq = new File(path, "Disciplinas.csv");
-		boolean exists = false;
-
-		if (arq.exists()) {
-			exists = true;
-		}
-
-		FileWriter fw = new FileWriter(arq, exists);
-		PrintWriter pw = new PrintWriter(fw);
-		pw.write(csvDisciplina + "\r\n");
-		pw.flush();
-		pw.close();
-		fw.close();
 
 	}
 
 	private void buscarDisciplina() throws Exception {
-		
-		//Captura dos dados do WB
+
+		// Captura dos dados do WB
 		Disciplina disciplina = new Disciplina();
-		Fila<Disciplina>disciplinaEncontrada=new Fila<>();
+		Fila<Disciplina> disciplinaEncontrada = new Fila<>();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
 		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
-		disciplina.setDiaSemana((String)cbDisciplinaDiaSemana.getSelectedItem());
-		
-		
+		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
+
 		if (!disciplina.getNomeDisciplina().isBlank()) {
-			disciplinaEncontrada = searchName(disciplina,disciplinaEncontrada);
+			disciplinaEncontrada = searchName(disciplina, disciplinaEncontrada);
 		} else if (!disciplina.getCodigoDisciplina().isBlank()) {
-			disciplinaEncontrada = searchCodeDisc(disciplina,disciplinaEncontrada);
+			disciplinaEncontrada = searchCodeDisc(disciplina, disciplinaEncontrada);
 		} else if (!disciplina.getCodigoCurso().isBlank()) {
-			 disciplinaEncontrada= searchCodeCourse(disciplina,disciplinaEncontrada);
-		}else if (!disciplina.getDiaSemana().isEmpty()) { 
-			disciplinaEncontrada=searchDiaSemana(disciplina,disciplinaEncontrada);
-		}
-		else {
+			disciplinaEncontrada = searchCodeCourse(disciplina, disciplinaEncontrada);
+		} else if (!disciplina.getDiaSemana().isEmpty()) {
+			disciplinaEncontrada = searchDiaSemana(disciplina, disciplinaEncontrada);
+		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
 			disciplina = null;
+			return;
 		}
 
-		if (disciplina != null && disciplinaEncontrada.size()>0) {
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n","Nome","Cód. da Disciplina","Dia da Semana",
-					"Hora Inicial","Horas Diárias","Cód. do Curso"));
-			while(!disciplinaEncontrada.isEmpty())
-			{
-				disciplina=disciplinaEncontrada.remove();
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n","Nome","Cód. da Disciplina","Dia da Semana",
-					"Hora Inicial","Horas Diárias","Cód. do Curso",disciplina.getNomeDisciplina() ,disciplina.getCodigoDisciplina(),
-					disciplina.getDiaSemana(), disciplina.getHoraInicial(), disciplina.getHorasDiarias(),disciplina.getCodigoCurso() ));
+		if (disciplina != null && disciplinaEncontrada.size() > 0) {
+			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n", "Nome", "Cód. da Disciplina",
+					"Dia da Semana", "Hora Inicial", "Horas Diárias", "Cód. do Curso"));
+			while (!disciplinaEncontrada.isEmpty()) {
+				disciplina = disciplinaEncontrada.remove();
+				taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n",
+						disciplina.getNomeDisciplina(), disciplina.getCodigoDisciplina(), disciplina.getDiaSemana(),
+						disciplina.getHoraInicial(), disciplina.getHorasDiarias(), disciplina.getCodigoCurso()));
 			}
-			} else {
-				JOptionPane.showMessageDialog(null, "Disciplina não encontrado", "ERRO", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(null, "Disciplina não encontrada", "ERRO", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}
 
-	private Fila<Disciplina> searchDiaSemana(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada) throws IOException {
+	private Fila<Disciplina> searchDiaSemana(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
+			throws IOException {
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Disciplinas.csv");
-		
+
 		if (arq.exists() && arq.isFile()) {
 			FileInputStream fis = new FileInputStream(arq);
 			InputStreamReader isr = new InputStreamReader(fis);
 			BufferedReader buffer = new BufferedReader(isr);
 			String linha = buffer.readLine();
-		
+
+			while (linha != null) {
+				String[] vetLinha = linha.split(";");
+				if (vetLinha[2].equals(disciplina.getDiaSemana())) {
+					Disciplina disciplinaAdd = new Disciplina();
+					disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
+					disciplinaAdd.setNomeDisciplina(vetLinha[1]);
+					disciplinaAdd.setDiaSemana(vetLinha[2]);
+					disciplinaAdd.setHoraInicial(vetLinha[3]);
+					disciplinaAdd.setHorasDiarias(vetLinha[4]);
+					disciplinaAdd.setCodigoCurso(vetLinha[5]);
+					disciplinaEncontrada.insert(disciplinaAdd);
+				}
+
+				linha = buffer.readLine();
+			}
+			buffer.close();
+			isr.close();
+			fis.close();
+		}
+		tfDisciplinaNome.setText("");
+		return disciplinaEncontrada;
+	}
+
+	private Fila<Disciplina> searchName(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
+			throws IOException {
+
+		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
+		File arq = new File(path, "Disciplinas.csv");
+
+		if (arq.exists() && arq.isFile()) {
+			FileInputStream fis = new FileInputStream(arq);
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader buffer = new BufferedReader(isr);
+			String linha = buffer.readLine();
+
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
 				if (vetLinha[1].equals(disciplina.getNomeDisciplina())) {
-					Disciplina disciplinaAdd=new Disciplina();
+					Disciplina disciplinaAdd = new Disciplina();
 					disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
 					disciplinaAdd.setNomeDisciplina(vetLinha[1]);
 					disciplinaAdd.setDiaSemana(vetLinha[2]);
@@ -236,57 +247,13 @@ public class DisciplinaController implements ActionListener {
 			fis.close();
 		}
 
-		//**remover ? 
-		if (disciplina.getCodigoDisciplina().equals("")) {
-			return null;
-		}
-
 		tfDisciplinaNome.setText("");
 		return disciplinaEncontrada;
 	}
 
-	private Fila<Disciplina> searchName(Disciplina disciplina,Fila<Disciplina>disciplinaEncontrada) throws IOException {
-		
-		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-		File arq = new File(path, "Disciplinas.csv");
-		
-		if (arq.exists() && arq.isFile()) {
-			FileInputStream fis = new FileInputStream(arq);
-			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader buffer = new BufferedReader(isr);
-			String linha = buffer.readLine();
-		
-			while (linha != null) {
-				String[] vetLinha = linha.split(";");
-				if (vetLinha[1].equals(disciplina.getNomeDisciplina())) {
-					Disciplina disciplinaAdd=new Disciplina();
-					disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
-					disciplinaAdd.setNomeDisciplina(vetLinha[1]);
-					disciplinaAdd.setDiaSemana(vetLinha[2]);
-					disciplinaAdd.setHoraInicial(vetLinha[3]);
-					disciplinaAdd.setHorasDiarias(vetLinha[4]);
-					disciplinaAdd.setCodigoCurso(vetLinha[5]);
-					disciplinaEncontrada.insert(disciplinaAdd);
-				}
+	private Fila<Disciplina> searchCodeDisc(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
+			throws IOException {
 
-				linha = buffer.readLine();
-			}
-			buffer.close();
-			isr.close();
-			fis.close();
-		}
-
-		//**remover ? 
-		if (disciplina.getCodigoDisciplina().equals("")) {
-			return null;
-		}
-
-		tfDisciplinaNome.setText("");
-		return disciplinaEncontrada;
-	}
-
-	private Fila<Disciplina> searchCodeDisc(Disciplina disciplina,Fila<Disciplina>disciplinaEncontrada) throws IOException {
-		
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Disciplinas.csv");
 		if (arq.exists() && arq.isFile()) {
@@ -297,7 +264,7 @@ public class DisciplinaController implements ActionListener {
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
 				if (vetLinha[0].equals(disciplina.getCodigoDisciplina())) {
-					Disciplina disciplinaAdd=new Disciplina();
+					Disciplina disciplinaAdd = new Disciplina();
 					disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
 					disciplinaAdd.setNomeDisciplina(vetLinha[1]);
 					disciplinaAdd.setDiaSemana(vetLinha[2]);
@@ -314,17 +281,14 @@ public class DisciplinaController implements ActionListener {
 			fis.close();
 		}
 
-		if (disciplina.getNomeDisciplina().equals("")) {
-			return null;
-		}
-
 		tfDisciplinaCodigo.setText("");
 
 		return disciplinaEncontrada;
 	}
 
-	private Fila<Disciplina> searchCodeCourse(Disciplina disciplina,Fila<Disciplina>disciplinaEncontrada) throws Exception {
-	
+	private Fila<Disciplina> searchCodeCourse(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
+			throws Exception {
+
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Disciplinas.csv");
 		if (arq.exists() && arq.isFile()) {
@@ -335,7 +299,7 @@ public class DisciplinaController implements ActionListener {
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
 				if (vetLinha[5].equals(disciplina.getCodigoCurso())) {
-					Disciplina disciplinaAdd=new Disciplina();
+					Disciplina disciplinaAdd = new Disciplina();
 					disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
 					disciplinaAdd.setNomeDisciplina(vetLinha[1]);
 					disciplinaAdd.setDiaSemana(vetLinha[2]);
@@ -352,18 +316,180 @@ public class DisciplinaController implements ActionListener {
 			fis.close();
 		}
 
-		if (disciplina.getNomeDisciplina().equals("")) {
-			return null;
-		}
-
 		tfDisciplinaCodigoCurso.setText("");
 
 		return disciplinaEncontrada;
 	}
-	private void allCourses() throws Exception {
+
+	private void deletarDisciplina() throws Exception {
+		// Capturo o dado para ser removido
+		Disciplina disciplina = new Disciplina();
+		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
+		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
+		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
+		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
+		Lista<Disciplina> listagemDeDisciplinas = new Lista<Disciplina>();
+
+		// Todo o arquivo csv é passado para uma lista
+		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
+		File arq = new File(path, "Disciplinas.csv");
+		alimentarLista("Disciplinas.csv", listagemDeDisciplinas);
+
+		// buscar o dado para ser removido na lista
+		int tamanhoAnterior = listagemDeDisciplinas.size();
+		int tamanho = listagemDeDisciplinas.size();
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina discLista = new Disciplina();
+			discLista = listagemDeDisciplinas.get(i);
+
+			if (!disciplina.getNomeDisciplina().isBlank()
+					&& discLista.getNomeDisciplina().contains(disciplina.getNomeDisciplina())
+					|| !disciplina.getCodigoCurso().isBlank()
+							&& discLista.getCodigoCurso().contains(disciplina.getCodigoCurso())
+					|| !disciplina.getDiaSemana().isBlank()
+							&& discLista.getDiaSemana().contains(disciplina.getDiaSemana())
+					|| !disciplina.getCodigoDisciplina().isEmpty()
+							&& discLista.getCodigoDisciplina().contains(disciplina.getCodigoDisciplina())) {
+				listagemDeDisciplinas.remove(i);
+				tamanho--;
+				JOptionPane.showMessageDialog(null, "Disciplina removida com sucesso!", "SUCESSO",
+						JOptionPane.PLAIN_MESSAGE);
+
+			}
+		}
+
+		// comparativo pra saber se teve algum dado removido
+		if (tamanhoAnterior == tamanho) {
+			JOptionPane.showMessageDialog(null,
+					"Nenhuma disciplina cadastrada com esses dados foi encontrada para ser removida", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		metodosPrincipais.limparArquivo("Disciplinas.csv");
+
+		// reescrever o novo arquivo
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina discLista = new Disciplina();
+			discLista = listagemDeDisciplinas.get(i);
+			metodosPrincipais.inserirNoArquivo(discLista.toString(), "Disciplinas.csv");
+		}
+	}
+
+	private void limparTADisciplina() {
+		taDisciplina.setText("");
+	}
+	
+	private void limparCamposDisciplina() {
+		tfDisciplinaNome.setText("");
+		tfDisciplinaCodigo.setText("");
+		tfDisciplinaCodigoCurso.setText("");
+		cbDisciplinaDiaSemana.setSelectedItem(null);
+		tfDisciplinaHora.setText("");
+		tfDisciplinaTotalHoras.setText("");
+
+	}
+
+	private int atualizarDisciplina() throws Exception {
+		Disciplina disciplina = new Disciplina();
+		Disciplina ItemListaDeDisciplina = new Disciplina();
+		Lista<Disciplina> ListagemDeDisciplinas = new Lista<>();
+		Fila<Disciplina> discEncontradas = new Fila<>();
+
+		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
+		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
+		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
+		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
+
+		if (!disciplina.getNomeDisciplina().isBlank()) {
+			searchName(disciplina, discEncontradas);
+		} else if (!disciplina.getCodigoDisciplina().isBlank()) {
+			searchCodeDisc(disciplina, discEncontradas);
+		} else if (!disciplina.getCodigoCurso().isBlank()) {
+			searchCodeCourse(disciplina, discEncontradas);
+		} else if (!disciplina.getDiaSemana().isEmpty()) {
+			searchDiaSemana(disciplina, discEncontradas);
+		} else {
+			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
+			disciplina = null;
+			return -1;
+		}
+
+		if (discEncontradas.size() > 1 ) {
+			JOptionPane.showMessageDialog(null, "A alteração deve ser feita apenas uma disciplina por vez", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
+		}else if(discEncontradas.size() == 0 ) {
+			JOptionPane.showMessageDialog(null, "Disciplina não encontrada", "ERRO", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			disciplina = discEncontradas.remove();
+			ListagemDeDisciplinas = alimentarLista("Disciplinas.csv", ListagemDeDisciplinas);
+			int tamanho = ListagemDeDisciplinas.size();
+			for (int i = 0; i < tamanho; i++) {
+				ItemListaDeDisciplina = ListagemDeDisciplinas.get(i);
+				if (!disciplina.getNomeDisciplina().isBlank() && ItemListaDeDisciplina.getNomeDisciplina().contains(disciplina.getNomeDisciplina())
+						&& !disciplina.getCodigoCurso().isBlank() && ItemListaDeDisciplina.getCodigoCurso().contains(disciplina.getCodigoCurso())
+						&& !disciplina.getDiaSemana().isBlank() && ItemListaDeDisciplina.getDiaSemana().contains(disciplina.getDiaSemana())
+						&& !disciplina.getCodigoDisciplina().isEmpty() && ItemListaDeDisciplina.getCodigoDisciplina().contains(disciplina.getCodigoDisciplina())) {
+					lblDisciplinaModoAlteracao.setVisible(true);
+					btnDisciplinaSalvarAlteracao.setVisible(true);
+					btnDisciplinaSalvarAlteracao.setEnabled(true);
+					taDisciplina.setText("Disciplina encontrada! Digite nos campos acima quais valores deseja alterar.\nOs campos que ficarem em branco não serão substituídos.");
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	private void salvarAlteracoes(int posicao) throws Exception {
+		Lista<Disciplina> ListagemDeDisciplinas = new Lista<>();
+		Disciplina disciplina = new Disciplina();
+		Disciplina discEncontrada = new Disciplina();
+
+		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
+		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
+		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
+		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
+
+		ListagemDeDisciplinas = alimentarLista("Disciplinas.csv", ListagemDeDisciplinas);
+
+		discEncontrada = ListagemDeDisciplinas.get(posicao);
+
+		if (!disciplina.getNomeDisciplina().isBlank()) {
+			discEncontrada.setNomeDisciplina(disciplina.getNomeDisciplina());
+		}
+		if (!disciplina.getCodigoDisciplina().isBlank()) {
+			discEncontrada.setCodigoDisciplina(disciplina.getCodigoDisciplina());
+		}
+		if (!disciplina.getCodigoCurso().isBlank()) {
+			discEncontrada.setCodigoCurso(disciplina.getCodigoCurso());
+		}
+		if (!disciplina.getDiaSemana().isEmpty()) {
+			discEncontrada.setDiaSemana(disciplina.getDiaSemana());
+		}
+
+		ListagemDeDisciplinas.add(discEncontrada, posicao);
+		ListagemDeDisciplinas.remove(posicao + 1);
+
+		metodosPrincipais.limparArquivo("Disciplinas.csv");
+		int tamanho = ListagemDeDisciplinas.size();
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina inserirDisc = new Disciplina();
+			inserirDisc = ListagemDeDisciplinas.get(i);
+			metodosPrincipais.inserirNoArquivo(inserirDisc.toString(), "Disciplinas.csv");
+		}
+
+		lblDisciplinaModoAlteracao.setVisible(false);
+		btnDisciplinaSalvarAlteracao.setVisible(false);
+		btnDisciplinaSalvarAlteracao.setEnabled(false);
+		JOptionPane.showMessageDialog(null, "Disciplina alterada!", "SUCESSO", JOptionPane.PLAIN_MESSAGE);
+
+	}
+
+	private void allDisciplines() throws Exception {
 		Fila<Disciplina> disciplinaEncontrada = new Fila<>();
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-		File arq = new File(path, "Cursos.csv");
+		File arq = new File(path, "Disciplinas.csv");
 		if (arq.exists() && arq.isFile()) {
 			FileInputStream fis = new FileInputStream(arq);
 			InputStreamReader isr = new InputStreamReader(fis);
@@ -372,87 +498,58 @@ public class DisciplinaController implements ActionListener {
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
 				Disciplina disciplina = new Disciplina();
-				if (vetLinha[5].equals(disciplina.getCodigoCurso())) {
-					disciplina.setCodigoDisciplina(vetLinha[0]);
-					disciplina.setNomeDisciplina(vetLinha[1]);
-					disciplina.setDiaSemana(vetLinha[2]);
-					disciplina.setHoraInicial(vetLinha[3]);
-					disciplina.setHorasDiarias(vetLinha[4]);
-					disciplinaEncontrada.insert(disciplina);
-				}
+				disciplina.setCodigoDisciplina(vetLinha[0]);
+				disciplina.setNomeDisciplina(vetLinha[1]);
+				disciplina.setDiaSemana(vetLinha[2]);
+				disciplina.setHoraInicial(vetLinha[3]);
+				disciplina.setHorasDiarias(vetLinha[4]);
+				disciplina.setCodigoCurso(vetLinha[5]);
+				disciplinaEncontrada.insert(disciplina);
 				linha = buffer.readLine();
 			}
 			buffer.close();
 			isr.close();
 			fis.close();
 		}
-	
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n","Nome","Cód. da Disciplina","Dia da Semana",
-					"Hora Inicial","Horas Diárias","Cód. do Curso"));
-			while(!disciplinaEncontrada.isEmpty())
-			{
-				Disciplina disciplinaAux=new Disciplina();
-				disciplinaAux=disciplinaEncontrada.remove();
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n",disciplinaAux.getNomeDisciplina() ,disciplinaAux.getCodigoDisciplina(),
-					disciplinaAux.getDiaSemana(), disciplinaAux.getHoraInicial(), disciplinaAux.getHorasDiarias(),disciplinaAux.getCodigoCurso() ));
-			}
+
+		taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n", "Nome", "Cód. da Disciplina",
+				"Dia da Semana", "Hora Inicial", "Horas Diárias", "Cód. do Curso"));
+		while (!disciplinaEncontrada.isEmpty()) {
+			Disciplina disciplinaAux = new Disciplina();
+			disciplinaAux = disciplinaEncontrada.remove();
+			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n",
+					disciplinaAux.getNomeDisciplina(), disciplinaAux.getCodigoDisciplina(),
+					disciplinaAux.getDiaSemana(), disciplinaAux.getHoraInicial(), disciplinaAux.getHorasDiarias(),
+					disciplinaAux.getCodigoCurso()));
+		}
 
 	}
-	private void deletarDisciplina() {
 
-		// Capturo o dado para ser removido
-//				Disciplina disciplina = new Disciplina();
-//				disciplina.(tfCursoCodigo.getText());
-//				disciplina.(tfCursoNome.getText());
-//				disciplina.((String) cbCursoAreaConhecimento.getSelectedItem());
-//			
-//				Lista<Curso> listagemDeCursos = new Lista<Curso>();
-//
-//				// Todo o arquivo csv é passado para uma lista
-//				String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-//				File arq = new File(path, "Cursos.csv");
-//				metodosPrincipais.alimentarLista("Cursos.csv", listagemDeCursos);
-//
-//				// buscar o dado para ser removido na lista
-//				int tamanhoAnterior = listagemDeCursos.size();
-//				int tamanho = listagemDeCursos.size();
-//				for (int i = 0; i < tamanho; i++) {
-//					Curso cursoLista = new Curso();
-//					cursoLista = listagemDeCursos.get(i);
-//
-//					if (!curso.getNomeCurso().isBlank() && cursoLista.getNomeCurso().contains(curso.getNomeCurso())
-//							|| !curso.getCodigoCurso().isBlank() && cursoLista.getCodigoCurso().contains(curso.getCodigoCurso())
-//							|| !curso.getAreaConhecimento().isEmpty()
-//									&& cursoLista.getAreaConhecimento().contains(curso.getAreaConhecimento())) {
-//						listagemDeCursos.remove(i);
-//						tamanho--;
-//						JOptionPane.showMessageDialog(null, "Curso removido com sucesso!", "SUCESSO",
-//								JOptionPane.PLAIN_MESSAGE);
-//
-//					}
-//				}
-//
-//				// comparativo pra saber se teve algum dado removido
-//				if (tamanhoAnterior == tamanho) {
-//					JOptionPane.showMessageDialog(null,
-//							"Nenhum curso cadastrado com esses dados foi encontrado para ser removido", "ERRO",
-//							JOptionPane.ERROR_MESSAGE);
-//				}
-//
-//				metodosPrincipais.limparArquivo("Cursos.csv");
-//
-//				// reescrever o novo arquivo
-//				for (int i = 0; i < tamanho; i++) {
-//					Curso cursoLista = new Curso();
-//					cursoLista = listagemDeCursos.get(i);
-//					metodosPrincipais.inserirNoArquivo(cursoLista.toString(), "Cursos.csv");
-//				}
+	public Lista<Disciplina> alimentarLista(String arquivoNome, Lista<Disciplina> listaDeItens) throws Exception {
+		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
+		File arq = new File(path, arquivoNome);
+		if (arq.exists() && arq.isFile()) {
+			FileInputStream fis = new FileInputStream(arq);
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader buffer = new BufferedReader(isr);
+			String linha = buffer.readLine();
+			while (linha != null) {
+				String[] vetLinha = linha.split(";");
+				Disciplina disciplinaAdd = new Disciplina();
+				disciplinaAdd.setCodigoDisciplina(vetLinha[0]);
+				disciplinaAdd.setNomeDisciplina(vetLinha[1]);
+				disciplinaAdd.setDiaSemana(vetLinha[2]);
+				disciplinaAdd.setHoraInicial(vetLinha[3]);
+				disciplinaAdd.setHorasDiarias(vetLinha[4]);
+				disciplinaAdd.setCodigoCurso(vetLinha[5]);
+				listaDeItens.addLast(disciplinaAdd);
+				linha = buffer.readLine();
+			}
+			buffer.close();
+			isr.close();
+			fis.close();
 		}
-	
-
-	private void limparDisciplina() {
-		taDisciplina.setText("");
-
+		return listaDeItens;
 	}
 
 }

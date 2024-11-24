@@ -4,9 +4,9 @@ public class Professor {
 	private String cpf;
 	private String nome;
 	private String areaConhecimento;
-	private int pontos;
+	private String pontos;
 
-	public Professor(String cpf, String nome, String areaConhecimento, int pontos) {
+	public Professor(String cpf, String nome, String areaConhecimento, String pontos) {
 		this.cpf = cpf;
 		this.nome = nome;
 		this.areaConhecimento = areaConhecimento;
@@ -46,11 +46,11 @@ public class Professor {
 		this.areaConhecimento = areaConhecimento;
 	}
 
-	public int getPontos() {
+	public String getPontos() {
 		return pontos;
 	}
 
-	public void setPontos(int pontos) {
+	public void setPontos(String pontos) {
 		this.pontos = pontos;
 	}
 

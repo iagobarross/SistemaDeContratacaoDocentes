@@ -51,29 +51,4 @@ public class MetodosPrincipaisController {
 		}
 	}
 
-	
-	//ALTERAR CURSOADD PRA DEIXAR METODO GLOBAL
-	public <T> Lista<T> alimentarLista(String arquivoNome, Lista<T> listaDeItens) throws Exception{
-		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-		File arq = new File(path, arquivoNome);
-		if (arq.exists() && arq.isFile()) {
-			FileInputStream fis = new FileInputStream(arq);
-			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader buffer = new BufferedReader(isr);
-			String linha = buffer.readLine();
-			while (linha != null) {
-				String[] vetLinha = linha.split(";");
-				Curso cursoadd = new Curso();
-				cursoadd.setCodigoCurso(vetLinha[0]);
-				cursoadd.setNomeCurso(vetLinha[1]);
-				cursoadd.setAreaConhecimento(vetLinha[2]);
-				listaDeItens.addLast((T) cursoadd);
-				linha = buffer.readLine();
-			}
-			buffer.close();
-			isr.close();
-			fis.close();
-		}
-		return listaDeItens;
-	}
 }
