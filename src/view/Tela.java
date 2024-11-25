@@ -118,6 +118,7 @@ public class Tela extends JFrame {
 		disciplinas.add(scrollPane);
 
 		JTextArea taDisciplina = new JTextArea();
+		taDisciplina.setEditable(false);
 		taDisciplina.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane.setViewportView(taDisciplina);
 
@@ -371,6 +372,7 @@ public class Tela extends JFrame {
 
 		JTextArea taProfessor = new JTextArea();
 		taProfessor.setFont(new Font("Monospaced", Font.PLAIN, 14));
+		taProfessor.setEditable(false);
 		scrollPane_2.setViewportView(taProfessor);
 
 		JButton btnProfessorCadastrar = new JButton("Cadastrar");

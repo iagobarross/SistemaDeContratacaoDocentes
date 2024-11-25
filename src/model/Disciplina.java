@@ -31,7 +31,7 @@ public class Disciplina {
 	}
 	
 	public int hashCode() {
-		int posicao = Integer.parseInt(codigoDisciplina)/100;
+		int posicao =(int) codigoCurso.charAt(0)-64;
 		return posicao;
 	}
 

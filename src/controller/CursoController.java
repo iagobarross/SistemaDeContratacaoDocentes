@@ -104,6 +104,13 @@ public class CursoController implements ActionListener {
 	}
 private void validarRepetidas() throws Exception {
 		Curso curso = new Curso();
+		if(tfCursoCodigo.getText().length() > 3 || tfCursoCodigo.getText().length() < 3) {
+			JOptionPane.showMessageDialog(null, "O código do curso deve ter apenas 3 caracteres de letras maiúsculas.", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		String codigoCurso = tfCursoCodigo.getText().toUpperCase();
+		curso.setCodigoCurso(codigoCurso);
 		curso.setCodigoCurso(tfCursoCodigo.getText());
 		curso.setNomeCurso(tfCursoNome.getText());
 		curso.setAreaConhecimento((String) cbCursoAreaConhecimento.getSelectedItem());
@@ -314,6 +321,7 @@ private void validarRepetidas() throws Exception {
 			Disciplina d = new Disciplina();
 			d = todasAsDisciplinas.get(i);
 			if(curso.getCodigoCurso().equals(d.getCodigoCurso())) {
+				dc.deletarInscricoesDaDisciplina(d);
 				todasAsDisciplinas.remove(i);
 				tamanho--;
 				i--;

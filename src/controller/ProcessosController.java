@@ -16,7 +16,7 @@ import br.edu.fateczl.Lista;
 import br.edu.fateczl.Fila.Fila;
 
 public class ProcessosController {
-	
+
 	private Lista<Disciplina>[] tabela;
 	private Fila<Curso> cursosEncontrados = new Fila<Curso>();
 	private Fila<Disciplina> disciplinaEncontrada = new Fila<Disciplina>();
@@ -27,7 +27,7 @@ public class ProcessosController {
 		this.taProcessos = taProcessos;
 	}
 
-	public void listarProcessosAtivos()  {
+	public void listarProcessosAtivos() {
 
 		try {
 			allCourses();
@@ -48,21 +48,19 @@ public class ProcessosController {
 		}
 		taProcessos.append(String.format("%-40s %-50s %-40s%n", "Cód.Processo", "Nome Disciplina", "Cód. Curso"));
 
-		int tamanho = tabela.length;
-
-		for (int i = 0; i < tamanho; i++) {
-			int tam = tabela[i].size();
-			for (int j = 0; j < tam; j++) {
-				Disciplina disciplina = new Disciplina();
-				try {
+		try {
+			int tamanho = tabela.length;
+			for (int i = 0; i < tamanho; i++) {
+				int tam = tabela[i].size();
+				for (int j = 0; j < tam; j++) {
+					Disciplina disciplina = new Disciplina();
 					disciplina = tabela[i].get(j);
-				} catch (Exception e) {
-					System.err.println(e.getMessage());
+					taProcessos.append(String.format("%-40s %-50s %-40s%n", disciplina.getCodigoProcesso(),
+							disciplina.getNomeDisciplina(), disciplina.getCodigoCurso()));
 				}
-				taProcessos.append(String.format("%-40s %-50s %-40s%n", disciplina.getCodigoProcesso(),
-						disciplina.getCodigoDisciplina(), disciplina.getCodigoCurso()));
-
 			}
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
 		}
 
 	}
@@ -109,6 +107,7 @@ public class ProcessosController {
 				disciplina.setHoraInicial(vetLinha[3]);
 				disciplina.setHorasDiarias(vetLinha[4]);
 				disciplina.setCodigoCurso(vetLinha[5]);
+				disciplina.setCodigoProcesso(vetLinha[6]);
 				disciplinaEncontrada.insert(disciplina);
 				linha = buffer.readLine();
 			}
@@ -119,19 +118,16 @@ public class ProcessosController {
 	}
 
 	private void inicializarLista() {
-		tabela = new Lista[cursosEncontrados.size()];
+		tabela = new Lista[26];
 		int tamanho = tabela.length;
 		for (int i = 0; i < tamanho; i++) {
 			tabela[i] = new Lista<>();
 		}
 	}
 
-	private void addDisciplina(Disciplina disciplina)throws Exception {
+	private void addDisciplina(Disciplina disciplina) throws Exception {
 
 		int posicao = disciplina.hashCode();
-		
-			tabela[posicao].addLast(disciplina);
-		}
+		tabela[posicao].addLast(disciplina);
 	}
-	
-	
+}

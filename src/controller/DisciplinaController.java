@@ -1,6 +1,5 @@
 package controller;
-
-/*     Se sobrar tempo adicionar cabeçalho na primeira gravação do CSV ( antes da criação )
+/*
  * 		Encurtar chamada de criação dos arquivos
  * 
  * 
@@ -125,8 +124,19 @@ public class DisciplinaController implements ActionListener {
 	private void validarRepetidas() throws Exception {
 		Disciplina disciplina = new Disciplina();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
+		try {
+			int codDisc = Integer.parseInt(tfDisciplinaCodigo.getText());			
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "O código da disciplina deve conter apenas números.", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		if(tfDisciplinaCodigo.getText().length() > 3 || tfDisciplinaCodigo.getText().length() < 3) {
+			JOptionPane.showMessageDialog(null, "O código da disciplina deve ter apenas 3 caracteres de número.", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
-			//
 		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
 		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
 		disciplina.setHoraInicial(tfDisciplinaHora.getText());
@@ -196,11 +206,11 @@ public class DisciplinaController implements ActionListener {
 		}
 
 		if (disciplina != null && disciplinaEncontrada.size() > 0) {
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n", "Nome", "Cód. da Disciplina",
+			taDisciplina.append(String.format("%-22s %-20s %-15s %-12s %-14s %-15s%n", "Nome", "Cód. da Disciplina",
 					"Dia da Semana", "Hora Inicial", "Horas Diárias", "Cód. do Curso"));
 			while (!disciplinaEncontrada.isEmpty()) {
 				disciplina = disciplinaEncontrada.remove();
-				taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n",
+				taDisciplina.append(String.format("%-22s %-20s %-15s %-12s %-14s %-15s%n",
 						disciplina.getNomeDisciplina(), disciplina.getCodigoDisciplina(), disciplina.getDiaSemana(),
 						disciplina.getHoraInicial(), disciplina.getHorasDiarias(), disciplina.getCodigoCurso()));
 			}
@@ -408,7 +418,7 @@ public class DisciplinaController implements ActionListener {
 	}
 
 	
-	private void deletarInscricoesDaDisciplina(Disciplina disciplina) throws Exception {
+	public void deletarInscricoesDaDisciplina(Disciplina disciplina) throws Exception {
 		Lista<Inscricoes> todasAsInscricoes = new Lista<Inscricoes>();
 		InscricoesController ic = new InscricoesController();
 		todasAsInscricoes = ic.alimentarLista("Inscricoes.csv", todasAsInscricoes);
@@ -576,12 +586,12 @@ public class DisciplinaController implements ActionListener {
 			fis.close();
 		}
 
-		taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n", "Nome", "Cód. da Disciplina",
+		taDisciplina.append(String.format("%-22s %-20s %-15s %-12s %-14s %-15s%n", "Nome", "Cód. da Disciplina",
 				"Dia da Semana", "Hora Inicial", "Horas Diárias", "Cód. do Curso"));
 		while (!disciplinaEncontrada.isEmpty()) {
 			Disciplina disciplinaAux = new Disciplina();
 			disciplinaAux = disciplinaEncontrada.remove();
-			taDisciplina.append(String.format("%-30s %-20s %-15s %-14s %-15s %-15s%n",
+			taDisciplina.append(String.format("%-22s %-20s %-15s %-12s %-14s %-15s%n",
 					disciplinaAux.getNomeDisciplina(), disciplinaAux.getCodigoDisciplina(),
 					disciplinaAux.getDiaSemana(), disciplinaAux.getHoraInicial(), disciplinaAux.getHorasDiarias(),
 					disciplinaAux.getCodigoCurso()));

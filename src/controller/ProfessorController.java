@@ -465,11 +465,11 @@ public class ProfessorController implements ActionListener {
 			fis.close();
 		}
 
-		taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n","Nome","Cpf","Area Conhecimento","Pontos"));
+		taProfessor.append(String.format("%-30s %-18s %-40s %-10s%n","Nome","Cpf","Area Conhecimento","Pontos"));
 		while (!professoresEncontrados.isEmpty()) {
 			Professor professor=new Professor();
 			professor = professoresEncontrados.remove();
-			taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n",professor.getNome(),professor.getCpf(),professor.getAreaConhecimento(),professor.getPontos()));
+			taProfessor.append(String.format("%-30s %-18s %-40s %-10s%n",professor.getNome(),professor.getCpf(),professor.getAreaConhecimento(),professor.getPontos()));
 		}
 	}
 

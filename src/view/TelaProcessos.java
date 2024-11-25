@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Font;
 import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -48,6 +49,7 @@ public class TelaProcessos extends JFrame {
 		
 		JTextArea taProcessos = new JTextArea();
 		taProcessos.setEditable(false);
+		taProcessos.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane.setViewportView(taProcessos);
 		ProcessosController procCont = new ProcessosController(taProcessos);
 		try {

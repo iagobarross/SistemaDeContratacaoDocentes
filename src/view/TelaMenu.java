@@ -74,6 +74,12 @@ public class TelaMenu extends JFrame {
 		btnProcessos.setBounds(432, 197, 173, 40);
 		contentPane.add(btnProcessos);
 
+		JButton btnManual = new JButton("Manual do Usuário");
+		btnManual.setToolTipText("");
+		btnManual.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnManual.setBounds(222, 259, 173, 40);
+		contentPane.add(btnManual);
+		
 		btnTela.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Tela tela = new Tela();
@@ -93,6 +99,12 @@ public class TelaMenu extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				TelaProcessos TelaProcessos = new TelaProcessos();
 				TelaProcessos.setVisible(true);
+			}
+		});
+		btnManual.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaManual telaManual = new TelaManual();
+				telaManual.setVisible(true);
 			}
 		});
 	}

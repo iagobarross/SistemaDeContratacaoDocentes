@@ -80,7 +80,7 @@ public class InscritosController implements ActionListener {
 			int tamanho = lista.size();
 			for(int i = 0 ; i < tamanho-1 ; i ++) {
 				for(int j=i+1;j<tamanho;j++) {				
-					if(Integer.parseInt(lista.get(i).getPontos())>Integer.parseInt(lista.get(j).getPontos())) {
+					if(Integer.parseInt(lista.get(i).getPontos())<Integer.parseInt(lista.get(j).getPontos())) {
 						Inscricoes inscricaoaux=lista.get(i);
 						lista.add(lista.get(j), i);
 						lista.add(inscricaoaux, j);
