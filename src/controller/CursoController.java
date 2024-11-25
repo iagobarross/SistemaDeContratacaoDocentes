@@ -40,6 +40,10 @@ public class CursoController implements ActionListener {
 		this.lblCursoModoAlteracao = lblCursoModoAlteracao;
 		this.btnCursoSalvarAlteracao = btnCursoSalvarAlteracao;
 	}
+	
+	public CursoController() {
+		super();
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -162,11 +166,10 @@ private void validarRepetidas() throws Exception {
 		}
 
 		if (curso != null && cursosEncontrados.size() > 0) {
-			taCurso.append("Cód. Curso\tNome\tÁrea de conhecimento\r\n");
+			taCurso.append(String.format("%-15s %-48s %-3s%n","Cód. Curso","Nome","Área de conhecimento"));
 			while (!cursosEncontrados.isEmpty()) {
 				curso = cursosEncontrados.remove();
-				taCurso.append(curso.getCodigoCurso() + "\t" + curso.getNomeCurso() + "\t" + curso.getAreaConhecimento()
-						+ "\r\n");
+				taCurso.append(String.format("%-15s %-48s %-3s%n",curso.getCodigoCurso(),curso.getNomeCurso(),curso.getAreaConhecimento()));
 			}
 		} else {
 			JOptionPane.showMessageDialog(null, "Curso não encontrado", "ERRO", JOptionPane.INFORMATION_MESSAGE);
@@ -452,12 +455,11 @@ private void validarRepetidas() throws Exception {
 			fis.close();
 		}
 
-		taCurso.append("Cód. Curso\tNome\tÁrea de conhecimento\r\n");
+		taCurso.append(String.format("%-15s %-48s %-3s%n","Cód. Curso","Nome","Área de conhecimento"));
 		while (!cursosEncontrados.isEmpty()) {
-			Curso curso = new Curso();
+			Curso curso=new Curso();
 			curso = cursosEncontrados.remove();
-			taCurso.append(
-					curso.getCodigoCurso() + "\t" + curso.getNomeCurso() + "\t" + curso.getAreaConhecimento() + "\r\n");
+			taCurso.append(String.format("%-15s %-48s %-3s%n",curso.getCodigoCurso(),curso.getNomeCurso(),curso.getAreaConhecimento()));
 		}
 
 	}

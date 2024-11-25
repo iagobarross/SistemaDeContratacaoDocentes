@@ -5,6 +5,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.ProcessosController;
+
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
@@ -46,6 +49,13 @@ public class TelaProcessos extends JFrame {
 		JTextArea taProcessos = new JTextArea();
 		taProcessos.setEditable(false);
 		scrollPane.setViewportView(taProcessos);
+		ProcessosController procCont = new ProcessosController(taProcessos);
+		try {
+			procCont.listarProcessosAtivos();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 }

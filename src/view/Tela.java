@@ -39,7 +39,7 @@ public class Tela extends JFrame {
 	public Tela() {
 
 		setTitle("Processo Seletivo");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 868, 640);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 480, 640));
@@ -118,7 +118,7 @@ public class Tela extends JFrame {
 		disciplinas.add(scrollPane);
 
 		JTextArea taDisciplina = new JTextArea();
-		taDisciplina.setFont(new Font("Monospaced", Font.PLAIN, 12));
+		taDisciplina.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane.setViewportView(taDisciplina);
 
 		JLabel lblDisciplinaCodigoCurso = new JLabel("Código do Curso");
@@ -249,6 +249,7 @@ public class Tela extends JFrame {
 
 		JTextArea taCurso = new JTextArea();
 		taCurso.setEditable(false);
+		taCurso.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane_1.setViewportView(taCurso);
 
 		JButton btnCursoCadastrar = new JButton("Cadastrar");
@@ -369,6 +370,7 @@ public class Tela extends JFrame {
 		professores.add(scrollPane_2);
 
 		JTextArea taProfessor = new JTextArea();
+		taProfessor.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane_2.setViewportView(taProfessor);
 
 		JButton btnProfessorCadastrar = new JButton("Cadastrar");
@@ -415,8 +417,16 @@ public class Tela extends JFrame {
 		professores.add(btnProfessorAtualizar);
 
 		ProfessorController profCont = new ProfessorController(tfProfessorCPF, tfProfessorNome,
-				cbProfessorAreaConhecimento, tfProfessorPontos, taProfessor, lblProfessorModoAlteracao,
-				btnProfessorAtualizar);
+				cbProfessorAreaConhecimento, tfProfessorPontos, taProfessor, btnProfessorSalvarAlteracao,
+				lblProfessorModoAlteracao);
+		
+		btnProfessorSalvarAlteracao.addActionListener(profCont);
+		btnProfessorBuscar.addActionListener(profCont);
+		btnProfessorCadastrar.addActionListener(profCont);
+		btnProfessorDeletar.addActionListener(profCont);
+		btnProfessorLimpar.addActionListener(profCont);
+		btnProfessorListarTodos.addActionListener(profCont);
+		btnProfessorAtualizar.addActionListener(profCont);
 
 		// ===============================================================================================================================================
 		// INSCRIÇÕES
@@ -436,12 +446,12 @@ public class Tela extends JFrame {
 		tfInscricoesNomeDisciplina.setBounds(138, 17, 220, 23);
 		inscricoes.add(tfInscricoesNomeDisciplina);
 		tfInscricoesNomeDisciplina.setColumns(10);
-		
+
 		JLabel lblnscricoesNomeProfessor = new JLabel("Nome do Professor");
 		lblnscricoesNomeProfessor.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblnscricoesNomeProfessor.setBounds(10, 55, 118, 14);
 		inscricoes.add(lblnscricoesNomeProfessor);
-		
+
 		tfInscricoesNomeProfessor = new JTextField();
 		tfInscricoesNomeProfessor.setColumns(10);
 		tfInscricoesNomeProfessor.setBounds(138, 53, 220, 23);
@@ -457,18 +467,15 @@ public class Tela extends JFrame {
 		inscricoes.add(scrollPane_3);
 
 		JTextArea taInscricoesInscritos = new JTextArea();
+		taInscricoesInscritos.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		taInscricoesInscritos.setEditable(false);
 		scrollPane_3.setViewportView(taInscricoesInscritos);
-		
+
 		JButton btnInscricoesBuscar = new JButton("Buscar");
 		btnInscricoesBuscar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnInscricoesBuscar.setBounds(131, 128, 106, 35);
 		inscricoes.add(btnInscricoesBuscar);
 
-		JButton btnInscricoesAtualizar = new JButton("Atualizar");
-		btnInscricoesAtualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnInscricoesAtualizar.setBounds(479, 128, 106, 35);
-		inscricoes.add(btnInscricoesAtualizar);
 
 		JButton btnInscricoesCadastrar = new JButton("Cadastrar");
 		btnInscricoesCadastrar.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -479,7 +486,6 @@ public class Tela extends JFrame {
 		btnInscricoesDeletar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnInscricoesDeletar.setBounds(363, 128, 106, 35);
 		inscricoes.add(btnInscricoesDeletar);
-
 
 		JLabel lblInscricaoModoAlteracao = new JLabel("Modo de Alteração");
 		lblInscricaoModoAlteracao.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -495,27 +501,21 @@ public class Tela extends JFrame {
 		btnInscricaoSalvarAlteracao.setEnabled(false);
 		inscricoes.add(btnInscricaoSalvarAlteracao);
 
-		InscricoesController inscCont = new InscricoesController(tfInscricoesNomeDisciplina, taInscricoesInscritos,
-				lblInscricaoModoAlteracao, btnInscricaoSalvarAlteracao);
-		
-		JButton btnDisciplinaLimpar_1 = new JButton("Limpar");
-		btnDisciplinaLimpar_1.setBounds(740, 147, 89, 23);
-		inscricoes.add(btnDisciplinaLimpar_1);
+		JButton btnInscricoesLimpar = new JButton("Limpar");
+		btnInscricoesLimpar.setBounds(740, 147, 89, 23);
+		inscricoes.add(btnInscricoesLimpar);
+
+		InscricoesController inscCont = new InscricoesController(tfInscricoesNomeDisciplina, tfInscricoesNomeProfessor, taInscricoesInscritos);
+
 
 		btnInscricaoSalvarAlteracao.addActionListener(inscCont);
 		btnInscricoesListarTodos.addActionListener(inscCont);
-		btnInscricoesAtualizar.addActionListener(inscCont);
 		btnInscricoesCadastrar.addActionListener(inscCont);
 		btnInscricoesDeletar.addActionListener(inscCont);
-		//btnInscricoesLimpar.addActionListener(inscCont);
+		btnInscricoesLimpar.addActionListener(inscCont);
+		btnInscricoesBuscar.addActionListener(inscCont);
 
-		btnProfessorSalvarAlteracao.addActionListener(profCont);
-		btnProfessorBuscar.addActionListener(profCont);
-		btnProfessorCadastrar.addActionListener(profCont);
-		btnProfessorDeletar.addActionListener(profCont);
-		btnProfessorLimpar.addActionListener(profCont);
-		btnProfessorListarTodos.addActionListener(profCont);
-		btnProfessorAtualizar.addActionListener(profCont);
+
 
 	}
 }

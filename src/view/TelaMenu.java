@@ -21,17 +21,16 @@ public class TelaMenu extends JFrame {
 	JLabel lblLogo = new JLabel();
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TelaMenu frame = new TelaMenu();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+        EventQueue.invokeLater(() -> {
+                try {
+                    TelaMenu frame = new TelaMenu();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+        });
+    }
 
 	public TelaMenu() {
 		setTitle("Sistema de Contratação de Docentes");

@@ -26,7 +26,6 @@ public class InscricoesController implements ActionListener {
 	private JTextField tfInscricoesNomeDisciplina;
 	private JTextField tfInscricoesNomeProfessor;
 	private JTextArea taInscricoesInscritos;
-	private int posicao = -1;
 	Lista<Inscricoes> listaInscricoes = new Lista<Inscricoes>();
 	MetodosPrincipaisController metodosPrincipais = new MetodosPrincipaisController();
 
@@ -38,15 +37,18 @@ public class InscricoesController implements ActionListener {
 
 	}
 
+	public InscricoesController(JTextField tfInscricoesNomeDisciplina2, JTextArea taInscricoesInscritos2,
+			JLabel lblInscricaoModoAlteracao, JButton btnInscricaoSalvarAlteracao) {
+
+	}
+
 	public InscricoesController() {
-		
+		super();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-
-		// Cadastra o curso na lista de cursos e no Cursos.csv
 		if (cmd.equals("Cadastrar")) {
 			try {
 				limparTAInscricao();
@@ -55,7 +57,6 @@ public class InscricoesController implements ActionListener {
 				e1.printStackTrace();
 			}
 		}
-		// Busca o curso com base nos dados passados para a busca
 		if (cmd.equals("Buscar")) {
 			try {
 				limparTAInscricao();
@@ -74,6 +75,7 @@ public class InscricoesController implements ActionListener {
 		}
 		if (cmd.equals("Limpar")) {
 			limparTAInscricao();
+			limparCamposInscricao();
 		}
 		if (cmd.equals("Listar")) {
 			try {
@@ -83,11 +85,10 @@ public class InscricoesController implements ActionListener {
 				e1.printStackTrace();
 			}
 		}
-	
+
 	}
 
-
-	private void allInscricoes() throws  Exception {
+	private void allInscricoes() throws Exception {
 		Fila<Inscricoes> inscricoesEncontradas = new Fila<>();
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Inscricoes.csv");
@@ -106,52 +107,43 @@ public class InscricoesController implements ActionListener {
 				inscricoesAdd.setNomeDisciplina(vetLinha[4]);
 				inscricoesAdd.setCodigoDisciplina(vetLinha[5]);
 				inscricoesAdd.setCodigoProcesso(vetLinha[6]);
+				inscricoesEncontradas.insert(inscricoesAdd);
 				linha = buffer.readLine();
 			}
 			buffer.close();
 			isr.close();
 			fis.close();
 		}
-
-		taInscricoesInscritos.append(String.format("%-28s %-12s %-30s %-20s %-15s%n", "Nome Prof", "Cpf",
-				"Nome Disc.", "Cód Disciplina", "Cód Processo"));
+		
+		taInscricoesInscritos.append(String.format("%-25s %-15s %-25s %-15s %-20s%n", "Nome Prof", "Cpf", "Nome Disc.",
+				"Cód. Disciplina", "Cód. Processo"));
 		while (!inscricoesEncontradas.isEmpty()) {
-			Inscricoes inscricao=new Inscricoes();
+			Inscricoes inscricao = new Inscricoes();
 			inscricao = inscricoesEncontradas.remove();
-			taInscricoesInscritos.append(String.format("%-28s %-12s %-30s %-20s %-15s%n",
-					inscricao.getNomeProfessor(), inscricao.getCpfProfessor(), inscricao.getNomeDisciplina(),
-					inscricao.getCodigoDisciplina(), inscricao.getCodigoProcesso()));
+			taInscricoesInscritos.append(String.format("%-25s %-15s %-25s %-15s %-20s%n", inscricao.getNomeProfessor(),
+					inscricao.getCpfProfessor(), inscricao.getNomeDisciplina(), inscricao.getCodigoDisciplina(),
+					inscricao.getCodigoProcesso()));
 			;
 		}
 
-		
 	}
 
-	private void deletarInscricao()throws Exception {
-		// Capturo o dado para ser removido
+	private void deletarInscricao() throws Exception {
 		Inscricoes inscricao = new Inscricoes();
 		inscricao.setNomeProfessor(tfInscricoesNomeProfessor.getText());
 		inscricao.setNomeDisciplina(tfInscricoesNomeDisciplina.getText());
-		Fila<Inscricoes>inscricaoEncontrada=new Fila<Inscricoes>();
-		inscricaoEncontrada=searchNome(inscricao, inscricaoEncontrada);
-		inscricao=inscricaoEncontrada.remove();
-		
-		Lista<Inscricoes> listagemDeInscricoes = new Lista<Inscricoes>();
 
-		// Todo o arquivo csv é passado para uma lista
-		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
-		File arq = new File(path, "Inscricoes.csv");
+		Lista<Inscricoes> listagemDeInscricoes = new Lista<Inscricoes>();
 		alimentarLista("Inscricoes.csv", listagemDeInscricoes);
 
-		// buscar o dado para ser removido na lista
 		int tamanhoAnterior = listagemDeInscricoes.size();
 		int tamanho = listagemDeInscricoes.size();
 		for (int i = 0; i < tamanho; i++) {
 			Inscricoes inscricaoLista = new Inscricoes();
 			inscricaoLista = listagemDeInscricoes.get(i);
 
-			if (!inscricao.getNomeProfessor().isBlank()&&inscricaoLista.getNomeProfessor().contains(inscricao.getNomeProfessor())
-					||!inscricao.getNomeDisciplina().isBlank()&&inscricaoLista.getNomeDisciplina().contains(inscricao.getNomeDisciplina())) {
+			if (!inscricao.getNomeProfessor().equals("") && inscricaoLista.getNomeProfessor().contains(inscricao.getNomeProfessor())
+					|| !inscricao.getNomeDisciplina().equals("") && inscricaoLista.getNomeDisciplina().contains(inscricao.getNomeDisciplina())) {
 				listagemDeInscricoes.remove(i);
 				i--;
 				tamanho--;
@@ -179,7 +171,7 @@ public class InscricoesController implements ActionListener {
 
 	}
 
-	Lista<Inscricoes> alimentarLista(String string, Lista<Inscricoes> listagemDeInscricoes) throws Exception {
+	public Lista<Inscricoes> alimentarLista(String string, Lista<Inscricoes> listagemDeInscricoes) throws Exception {
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Inscricoes.csv");
 
@@ -191,17 +183,17 @@ public class InscricoesController implements ActionListener {
 
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
-					Inscricoes inscricoesAdd = new Inscricoes();
-					inscricoesAdd.setNomeProfessor(vetLinha[0]);
-					inscricoesAdd.setCpfProfessor(vetLinha[1]);
-					inscricoesAdd.setPontos(vetLinha[2]);
-					inscricoesAdd.setAreaConhecimento(vetLinha[3]);
-					inscricoesAdd.setNomeDisciplina(vetLinha[4]);
-					inscricoesAdd.setCodigoDisciplina(vetLinha[5]);
-					inscricoesAdd.setCodigoProcesso(vetLinha[6]);
-					listagemDeInscricoes.addLast(inscricoesAdd);
-					linha = buffer.readLine();
-				}
+				Inscricoes inscricoesAdd = new Inscricoes();
+				inscricoesAdd.setNomeProfessor(vetLinha[0]);
+				inscricoesAdd.setCpfProfessor(vetLinha[1]);
+				inscricoesAdd.setPontos(vetLinha[2]);
+				inscricoesAdd.setAreaConhecimento(vetLinha[3]);
+				inscricoesAdd.setNomeDisciplina(vetLinha[4]);
+				inscricoesAdd.setCodigoDisciplina(vetLinha[5]);
+				inscricoesAdd.setCodigoProcesso(vetLinha[6]);
+				listagemDeInscricoes.addLast(inscricoesAdd);
+				linha = buffer.readLine();
+			}
 			buffer.close();
 			isr.close();
 			fis.close();
@@ -209,7 +201,6 @@ public class InscricoesController implements ActionListener {
 
 		return listagemDeInscricoes;
 
-		
 	}
 
 	private void buscarInscricao() throws Exception {
@@ -225,17 +216,17 @@ public class InscricoesController implements ActionListener {
 		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
 			inscricao = null;
+			return;
 		}
 
 		if (inscricao != null && inscricoesEncontradas.size() > 0) {
-			taInscricoesInscritos.append(String.format("%-28s %-12s %-30s %-10s %-10%n", "Nome Prof", "Cpf",
-					"Nome Disc.", "Cód Disciplina", "Cód Processo"));
+			taInscricoesInscritos.append(String.format("%-25s %-15s %-25s %-15s %-20s%n", "Nome Prof", "Cpf", "Nome Disc.",
+					"Cód Disciplina", "Cód Processo"));
 			while (!inscricoesEncontradas.isEmpty()) {
 				inscricao = inscricoesEncontradas.remove();
-				taInscricoesInscritos.append(String.format("%-28s %-12s %-30s %-10s %-10s%n",
-						inscricao.getNomeProfessor(), inscricao.getCpfProfessor(), inscricao.getNomeDisciplina(),
-						inscricao.getCodigoDisciplina(), inscricao.getCodigoProcesso()));
-				;
+				taInscricoesInscritos.append(String.format("%-25s %-15s %-25s %-15s %-20s%n", inscricao.getNomeProfessor(),
+						inscricao.getCpfProfessor(), inscricao.getNomeDisciplina(), inscricao.getCodigoDisciplina(),
+						inscricao.getCodigoProcesso()));
 			}
 		} else {
 			JOptionPane.showMessageDialog(null, "Inscricao não encontrado", "ERRO", JOptionPane.INFORMATION_MESSAGE);
@@ -257,7 +248,7 @@ public class InscricoesController implements ActionListener {
 
 			while (linha != null) {
 				String[] vetLinha = linha.split(";");
-				if (vetLinha[2].equals(inscricao.getNomeDisciplina())) {
+				if (vetLinha[4].equals(inscricao.getNomeDisciplina())) {
 					Inscricoes inscricoesAdd = new Inscricoes();
 					inscricoesAdd.setNomeProfessor(vetLinha[0]);
 					inscricoesAdd.setCpfProfessor(vetLinha[1]);
@@ -319,50 +310,55 @@ public class InscricoesController implements ActionListener {
 	private void cadastrarInscricao() throws Exception {
 
 		Inscricoes inscricao = new Inscricoes();
-		Disciplina disciplina = new Disciplina();
-		Fila<Disciplina> filaDisciplina = new Fila<Disciplina>();
-		Fila<Professor> filaProfessor = new Fila<>();
-		Professor professor = new Professor();
 		inscricao.setNomeProfessor(tfInscricoesNomeProfessor.getText());
 		inscricao.setNomeDisciplina(tfInscricoesNomeDisciplina.getText());
-		disciplina.setNomeDisciplina(inscricao.getNomeDisciplina());
 
+		Lista<Disciplina> listaDeDisciplinas = new Lista<Disciplina>();
 		DisciplinaController discCont = new DisciplinaController();
-		filaDisciplina = discCont.searchName(disciplina, filaDisciplina);
-		disciplina = filaDisciplina.remove();
+		listaDeDisciplinas = discCont.alimentarLista("Disciplinas.csv", listaDeDisciplinas);
+		int tamanho = listaDeDisciplinas.size();
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina d = new Disciplina();
+			d = listaDeDisciplinas.get(i);
+			if (d.getNomeDisciplina().equals(inscricao.getNomeDisciplina())) {
+				inscricao.setCodigoDisciplina(d.getCodigoDisciplina());
+				inscricao.setCodigoProcesso(d.getCodigoProcesso());
+				break;
+			}
+		}
 
+		Lista<Professor> listaDeProfessores = new Lista<Professor>();
 		ProfessorController profCont = new ProfessorController();
-		filaProfessor = profCont.searchNome(professor, filaProfessor);
-		professor = filaProfessor.remove();
+		listaDeProfessores = profCont.alimentarLista("Professores.csv", listaDeProfessores);
+		int tamanho2 = listaDeProfessores.size();
+		for (int i = 0; i < tamanho2; i++) {
+			Professor p = new Professor();
+			p = listaDeProfessores.get(i);
+			if (p.getNome().equals(inscricao.getNomeProfessor())) {
+				inscricao.setCpfProfessor(p.getCpf());
+				inscricao.setAreaConhecimento(p.getAreaConhecimento());
+				inscricao.setPontos(p.getPontos());
+				break;
+			}
+		}
 
-		inscricao.setCodigoDisciplina(disciplina.getCodigoDisciplina());
-		inscricao.setCodigoProcesso(disciplina.getCodigoProcesso());
-		inscricao.setCpfProfessor(professor.getCpf());
-		inscricao.setPontos(professor.getPontos());
-		inscricao.setAreaConhecimento(professor.getAreaConhecimento());
+		if (!inscricao.getAreaConhecimento().isEmpty() && !inscricao.getCodigoDisciplina().isEmpty()
+				&& !inscricao.getCpfProfessor().isEmpty() && !inscricao.getNomeDisciplina().isEmpty()
+				&& !inscricao.getNomeProfessor().isEmpty() && !inscricao.getPontos().isEmpty()) {
 
-		if (!inscricao.getNomeDisciplina().equals("") && !inscricao.getCodigoDisciplina().equals("")
-				&& !inscricao.getCodigoProcesso().equals("") && !inscricao.getCpfProfessor().equals("")
-				&& !inscricao.getNomeProfessor().equals("") && !inscricao.getAreaConhecimento().equals("")
-				&& !inscricao.getPontos().equals("")) {
-			// adicionar o curso na lista de cursos
 			listaInscricoes.addLast(inscricao);
-
-			// inserir o curso no Curso.csv
 			metodosPrincipais.inserirNoArquivo(inscricao.toString(), "Inscricoes.csv");
-
-			// limpar os campos
+			
 			limparCamposInscricao();
-			taInscricoesInscritos.setText("Inscrição adicionada!.");
-
+			taInscricoesInscritos.append("Inscrição adicionada!");
 		} else {
 			JOptionPane.showMessageDialog(null,
-					"Todas as informações devem ser preenchidas para cadastrar um novo curso", "ERRO",
+					"Todas as informações devem ser preenchidas para cadastrar uma nova inscrição", "ERRO",
 					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
-
+		
 	private void limparCamposInscricao() {
 		tfInscricoesNomeDisciplina.setText("");
 		tfInscricoesNomeProfessor.setText("");
@@ -370,7 +366,6 @@ public class InscricoesController implements ActionListener {
 	}
 
 	private void limparTAInscricao() {
-
 		taInscricoesInscritos.setText("");
 
 	}

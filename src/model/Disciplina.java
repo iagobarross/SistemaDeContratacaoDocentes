@@ -27,11 +27,11 @@ public class Disciplina {
 	@Override
 	public String toString() {
 		return codigoDisciplina + ";" + nomeDisciplina + ";" + diaSemana + ";" + horaInicial + ";" + horasDiarias + ";"
-				+ codigoCurso;
+				+ codigoCurso + ";" + codigoProcesso;
 	}
 	
 	public int hashCode() {
-		int posicao = Integer.parseInt(codigoProcesso) / 100;
+		int posicao = Integer.parseInt(codigoDisciplina)/100;
 		return posicao;
 	}
 

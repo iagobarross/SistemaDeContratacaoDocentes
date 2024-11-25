@@ -3,6 +3,9 @@ package view;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.InscritosController;
+
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Image;
@@ -64,10 +67,16 @@ public class TelaInscritos extends JFrame {
 		
 		JTextArea taInscritos = new JTextArea();
 		taInscritos.setEditable(false);
+		taInscritos.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		scrollPane.setViewportView(taInscritos);
 		
 		JButton btnProcessosLimpar = new JButton("Limpar");
 		btnProcessosLimpar.setBounds(745, 124, 89, 23);
 		contentPane.add(btnProcessosLimpar);
+		
+		InscritosController inscCont =new InscritosController(tfInscritosNomeDisciplina, taInscritos);
+		
+		btnInscritosListar.addActionListener(inscCont);
+		btnProcessosLimpar.addActionListener(inscCont);
 	}
 }

@@ -42,10 +42,8 @@ public class DisciplinaController implements ActionListener {
 	private JLabel lblDisciplinaModoAlteracao;
 	private JButton btnDisciplinaSalvarAlteracao;
 	private int posicao = -1;
-	private static String codProcesso="2024";
 	Lista<Disciplina> listaDisciplinas = new Lista<>();
 	MetodosPrincipaisController metodosPrincipais = new MetodosPrincipaisController();
-//private static int codigoProcesso;
 
 	public DisciplinaController(JTextField tfDisciplinaCodigo, JTextField tfDisciplinaNome,
 			JComboBox<String> cbDisciplinaDiaSemana, JTextField tfDisciplinaHora, JTextField tfDisciplinaTotalHoras,
@@ -128,13 +126,13 @@ public class DisciplinaController implements ActionListener {
 		Disciplina disciplina = new Disciplina();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
+			//
 		disciplina.setCodigoCurso(tfDisciplinaCodigoCurso.getText());
 		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
 		disciplina.setHoraInicial(tfDisciplinaHora.getText());
 		disciplina.setHorasDiarias(tfDisciplinaTotalHoras.getText());
-                codProcesso=codProcesso+disciplina.getCodigoDisciplina();
-			
-			disciplina.setCodigoProcesso(codProcesso);
+		String codigo = "2024_" + disciplina.getCodigoCurso() + "_" + disciplina.getCodigoDisciplina();
+		disciplina.setCodigoProcesso(codigo);
 		Lista<Disciplina> todosAsDisciplinas = new Lista<Disciplina>();
 
 		todosAsDisciplinas = alimentarLista("Disciplinas.csv", todosAsDisciplinas);
@@ -159,7 +157,7 @@ public class DisciplinaController implements ActionListener {
 
 		if (!disciplina.getDiaSemana().equals("") && !disciplina.getCodigoCurso().equals("")
 				&& !disciplina.getNomeDisciplina().equals("") && !disciplina.getCodigoDisciplina().equals("")
-				&& !disciplina.getHoraInicial().equals("") && !disciplina.getHorasDiarias().equals("")) {
+				&& !disciplina.getHoraInicial().equals("") && !disciplina.getHorasDiarias().equals("") && !disciplina.getCodigoDisciplina().equals("")) {
 			listaDisciplinas.addLast(disciplina);
 
 			metodosPrincipais.inserirNoArquivo(disciplina.toString(), "Disciplinas.csv");
@@ -176,8 +174,6 @@ public class DisciplinaController implements ActionListener {
 	}
 
 	private void buscarDisciplina() throws Exception {
-
-		// Captura dos dados do WB
 		Disciplina disciplina = new Disciplina();
 		Fila<Disciplina> disciplinaEncontrada = new Fila<>();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
@@ -610,6 +606,7 @@ public class DisciplinaController implements ActionListener {
 				disciplinaAdd.setHoraInicial(vetLinha[3]);
 				disciplinaAdd.setHorasDiarias(vetLinha[4]);
 				disciplinaAdd.setCodigoCurso(vetLinha[5]);
+				disciplinaAdd.setCodigoProcesso(vetLinha[6]);
 				listaDeItens.addLast(disciplinaAdd);
 				linha = buffer.readLine();
 			}

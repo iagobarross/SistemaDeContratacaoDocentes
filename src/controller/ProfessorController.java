@@ -185,11 +185,10 @@ public class ProfessorController implements ActionListener {
 		}
 
 		if (professor != null && professorEncontrado.size() > 0) {
-			taProfessor.append("Nome\t\tCPF\t\t Area Conhecimento\t\t Pontos\r\n");
+			taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n","Nome","Cpf","Area Conhecimento","Pontos"));
 			while (!professorEncontrado.isEmpty()) {
 				professor = professorEncontrado.remove();
-				taProfessor.append(professor.getNome() + "\t" + professor.getCpf() + "\t\t"
-						+ professor.getAreaConhecimento() + "\t\t" + professor.getPontos() + "\r\n");
+				taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n",professor.getNome(),professor.getCpf(),professor.getAreaConhecimento(),professor.getPontos()));
 			}
 		} else {
 			JOptionPane.showMessageDialog(null, "Professor não encontrado", "ERRO", JOptionPane.INFORMATION_MESSAGE);
@@ -466,12 +465,11 @@ public class ProfessorController implements ActionListener {
 			fis.close();
 		}
 
-		taProfessor.append("Nome\t\tCPF\t\t Area Conhecimento\t\t Pontos\r\n");
+		taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n","Nome","Cpf","Area Conhecimento","Pontos"));
 		while (!professoresEncontrados.isEmpty()) {
-			Professor professor = new Professor();
+			Professor professor=new Professor();
 			professor = professoresEncontrados.remove();
-			taProfessor.append(professor.getNome() + "\t" + professor.getCpf() + "\t\t"
-					+ professor.getAreaConhecimento() + "\t\t" + professor.getPontos() + "\r\n");
+			taProfessor.append(String.format("%-30s %-12s %-40s %-10s%n",professor.getNome(),professor.getCpf(),professor.getAreaConhecimento(),professor.getPontos()));
 		}
 	}
 
@@ -498,7 +496,7 @@ public class ProfessorController implements ActionListener {
 		if (!professor.getNome().isBlank()) {
 			professorEncontrado.setNome(professor.getNome());
 		}
-		if (professor.getPontos().isBlank()) { // Se o professor tirar 0 ?
+		if (!professor.getPontos().isBlank()) {
 			professorEncontrado.setPontos(professor.getPontos());
 		}
 
