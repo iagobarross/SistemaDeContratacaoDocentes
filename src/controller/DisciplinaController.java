@@ -27,7 +27,9 @@ import javax.swing.JTextField;
 
 import br.edu.fateczl.Lista;
 import br.edu.fateczl.Fila.Fila;
+import model.Curso;
 import model.Disciplina;
+import model.Inscricoes;
 
 public class DisciplinaController implements ActionListener {
 	private JTextField tfDisciplinaCodigo;
@@ -40,13 +42,15 @@ public class DisciplinaController implements ActionListener {
 	private JLabel lblDisciplinaModoAlteracao;
 	private JButton btnDisciplinaSalvarAlteracao;
 	private int posicao = -1;
+	private static String codProcesso="2024";
 	Lista<Disciplina> listaDisciplinas = new Lista<>();
 	MetodosPrincipaisController metodosPrincipais = new MetodosPrincipaisController();
 //private static int codigoProcesso;
 
 	public DisciplinaController(JTextField tfDisciplinaCodigo, JTextField tfDisciplinaNome,
 			JComboBox<String> cbDisciplinaDiaSemana, JTextField tfDisciplinaHora, JTextField tfDisciplinaTotalHoras,
-			JTextField tfDisciplinaCodigoCurso, JTextArea taDisciplina, JLabel lblDisciplinaModoAlteracao, JButton btnDisciplinaSalvarAlteracao) {
+			JTextField tfDisciplinaCodigoCurso, JTextArea taDisciplina, JLabel lblDisciplinaModoAlteracao,
+			JButton btnDisciplinaSalvarAlteracao) {
 		this.tfDisciplinaCodigo = tfDisciplinaCodigo;
 		this.tfDisciplinaNome = tfDisciplinaNome;
 		this.cbDisciplinaDiaSemana = cbDisciplinaDiaSemana;
@@ -57,6 +61,10 @@ public class DisciplinaController implements ActionListener {
 		this.lblDisciplinaModoAlteracao = lblDisciplinaModoAlteracao;
 		this.btnDisciplinaSalvarAlteracao = btnDisciplinaSalvarAlteracao;
 	}
+	
+	public DisciplinaController() {
+		super();
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -64,7 +72,7 @@ public class DisciplinaController implements ActionListener {
 		if (cmd.equals("Cadastrar")) {
 			try {
 				limparTADisciplina();
-				cadastrarDisciplina();
+				validarRepetidas();
 			} catch (Exception e1) {
 				System.err.println(e1.getMessage());
 			}
@@ -83,7 +91,6 @@ public class DisciplinaController implements ActionListener {
 				limparTADisciplina();
 				deletarDisciplina();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -117,8 +124,7 @@ public class DisciplinaController implements ActionListener {
 		}
 	}
 
-	private void cadastrarDisciplina() throws Exception {
-
+	private void validarRepetidas() throws Exception {
 		Disciplina disciplina = new Disciplina();
 		disciplina.setNomeDisciplina(tfDisciplinaNome.getText());
 		disciplina.setCodigoDisciplina(tfDisciplinaCodigo.getText());
@@ -126,9 +132,34 @@ public class DisciplinaController implements ActionListener {
 		disciplina.setDiaSemana((String) cbDisciplinaDiaSemana.getSelectedItem());
 		disciplina.setHoraInicial(tfDisciplinaHora.getText());
 		disciplina.setHorasDiarias(tfDisciplinaTotalHoras.getText());
+                codProcesso=codProcesso+disciplina.getCodigoDisciplina();
+			
+			disciplina.setCodigoProcesso(codProcesso);
+		Lista<Disciplina> todosAsDisciplinas = new Lista<Disciplina>();
 
-		if (!disciplina.getDiaSemana().isEmpty() && !disciplina.getCodigoCurso().equals("")
-				&& !disciplina.getNomeDisciplina().equals("") && !disciplina.getCodigoDisciplina().equals("") && !disciplina.getHoraInicial().equals("") && !disciplina.getHorasDiarias().equals("")) {
+		todosAsDisciplinas = alimentarLista("Disciplinas.csv", todosAsDisciplinas);
+
+		int tamanho = todosAsDisciplinas.size();
+
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina d = new Disciplina();
+			d = todosAsDisciplinas.get(i);
+			if (disciplina.getDiaSemana().equals(d.getDiaSemana())
+					&& disciplina.getNomeDisciplina().equals(d.getNomeDisciplina()) && disciplina.getCodigoDisciplina().equals(d.getCodigoDisciplina())
+					&& disciplina.getHoraInicial().equals(d.getHoraInicial()) && disciplina.getHorasDiarias().equals(d.getHorasDiarias())) {
+				JOptionPane.showMessageDialog(null, "Esta disciplina já está cadastrada no sistema.\nA disciplina só poderá ser cadastrada em apenas um curso.", "ERRO",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		cadastrarDisciplina(disciplina);
+	}
+
+	private void cadastrarDisciplina(Disciplina disciplina) throws Exception {
+
+		if (!disciplina.getDiaSemana().equals("") && !disciplina.getCodigoCurso().equals("")
+				&& !disciplina.getNomeDisciplina().equals("") && !disciplina.getCodigoDisciplina().equals("")
+				&& !disciplina.getHoraInicial().equals("") && !disciplina.getHorasDiarias().equals("")) {
 			listaDisciplinas.addLast(disciplina);
 
 			metodosPrincipais.inserirNoArquivo(disciplina.toString(), "Disciplinas.csv");
@@ -137,7 +168,9 @@ public class DisciplinaController implements ActionListener {
 			taDisciplina.setText("Disciplina adicionada!");
 
 		} else {
-			JOptionPane.showMessageDialog(null, "Todas as informações devem ser preenchidas para cadastrar um novo curso", "ERRO", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null,
+					"Todas as informações devem ser preenchidas para cadastrar uma nova disciplina", "ERRO",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
@@ -158,7 +191,7 @@ public class DisciplinaController implements ActionListener {
 			disciplinaEncontrada = searchCodeDisc(disciplina, disciplinaEncontrada);
 		} else if (!disciplina.getCodigoCurso().isBlank()) {
 			disciplinaEncontrada = searchCodeCourse(disciplina, disciplinaEncontrada);
-		} else if (!disciplina.getDiaSemana().isEmpty()) {
+		} else if (!disciplina.getDiaSemana().equals("")) {
 			disciplinaEncontrada = searchDiaSemana(disciplina, disciplinaEncontrada);
 		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
@@ -215,7 +248,7 @@ public class DisciplinaController implements ActionListener {
 		return disciplinaEncontrada;
 	}
 
-	private Fila<Disciplina> searchName(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
+	Fila<Disciplina> searchName(Disciplina disciplina, Fila<Disciplina> disciplinaEncontrada)
 			throws IOException {
 
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
@@ -346,12 +379,14 @@ public class DisciplinaController implements ActionListener {
 					&& discLista.getNomeDisciplina().contains(disciplina.getNomeDisciplina())
 					|| !disciplina.getCodigoCurso().isBlank()
 							&& discLista.getCodigoCurso().contains(disciplina.getCodigoCurso())
-					|| !disciplina.getDiaSemana().isBlank()
+					|| !disciplina.getDiaSemana().equals("")
 							&& discLista.getDiaSemana().contains(disciplina.getDiaSemana())
 					|| !disciplina.getCodigoDisciplina().isEmpty()
 							&& discLista.getCodigoDisciplina().contains(disciplina.getCodigoDisciplina())) {
 				listagemDeDisciplinas.remove(i);
+				deletarInscricoesDaDisciplina(discLista);
 				tamanho--;
+				i--;
 				JOptionPane.showMessageDialog(null, "Disciplina removida com sucesso!", "SUCESSO",
 						JOptionPane.PLAIN_MESSAGE);
 
@@ -376,15 +411,43 @@ public class DisciplinaController implements ActionListener {
 		}
 	}
 
+	
+	private void deletarInscricoesDaDisciplina(Disciplina disciplina) throws Exception {
+		Lista<Inscricoes> todasAsInscricoes = new Lista<Inscricoes>();
+		InscricoesController ic = new InscricoesController();
+		todasAsInscricoes = ic.alimentarLista("Inscricoes.csv", todasAsInscricoes);
+		
+		int tamanho = todasAsInscricoes.size();
+		
+		for(int i = 0 ; i < tamanho ;i ++) {
+			Inscricoes insc = new Inscricoes();
+			insc = todasAsInscricoes.get(i);
+			if(disciplina.getCodigoProcesso().equals(insc.getCodigoProcesso())) {
+				todasAsInscricoes.remove(i);
+				tamanho--;
+				i--;
+			}
+		}
+		
+		metodosPrincipais.limparArquivo("Inscricoes.csv");
+
+		for (int i = 0; i < tamanho; i++) {
+			Inscricoes insc = new Inscricoes();			
+			insc = todasAsInscricoes.get(i);
+			metodosPrincipais.inserirNoArquivo(insc.toString(), "Inscricoes.csv");
+		}
+				
+	}
+	
 	private void limparTADisciplina() {
 		taDisciplina.setText("");
 	}
-	
+
 	private void limparCamposDisciplina() {
 		tfDisciplinaNome.setText("");
 		tfDisciplinaCodigo.setText("");
 		tfDisciplinaCodigoCurso.setText("");
-		cbDisciplinaDiaSemana.setSelectedItem(null);
+		cbDisciplinaDiaSemana.setSelectedItem("");
 		tfDisciplinaHora.setText("");
 		tfDisciplinaTotalHoras.setText("");
 
@@ -407,7 +470,7 @@ public class DisciplinaController implements ActionListener {
 			searchCodeDisc(disciplina, discEncontradas);
 		} else if (!disciplina.getCodigoCurso().isBlank()) {
 			searchCodeCourse(disciplina, discEncontradas);
-		} else if (!disciplina.getDiaSemana().isEmpty()) {
+		} else if (!disciplina.getDiaSemana().equals("")) {
 			searchDiaSemana(disciplina, discEncontradas);
 		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
@@ -415,10 +478,10 @@ public class DisciplinaController implements ActionListener {
 			return -1;
 		}
 
-		if (discEncontradas.size() > 1 ) {
+		if (discEncontradas.size() > 1) {
 			JOptionPane.showMessageDialog(null, "A alteração deve ser feita apenas uma disciplina por vez", "ERRO",
 					JOptionPane.ERROR_MESSAGE);
-		}else if(discEncontradas.size() == 0 ) {
+		} else if (discEncontradas.size() == 0) {
 			JOptionPane.showMessageDialog(null, "Disciplina não encontrada", "ERRO", JOptionPane.INFORMATION_MESSAGE);
 		} else {
 			disciplina = discEncontradas.remove();
@@ -426,14 +489,19 @@ public class DisciplinaController implements ActionListener {
 			int tamanho = ListagemDeDisciplinas.size();
 			for (int i = 0; i < tamanho; i++) {
 				ItemListaDeDisciplina = ListagemDeDisciplinas.get(i);
-				if (!disciplina.getNomeDisciplina().isBlank() && ItemListaDeDisciplina.getNomeDisciplina().contains(disciplina.getNomeDisciplina())
-						&& !disciplina.getCodigoCurso().isBlank() && ItemListaDeDisciplina.getCodigoCurso().contains(disciplina.getCodigoCurso())
-						&& !disciplina.getDiaSemana().isBlank() && ItemListaDeDisciplina.getDiaSemana().contains(disciplina.getDiaSemana())
-						&& !disciplina.getCodigoDisciplina().isEmpty() && ItemListaDeDisciplina.getCodigoDisciplina().contains(disciplina.getCodigoDisciplina())) {
+				if (!disciplina.getNomeDisciplina().isBlank()
+						&& ItemListaDeDisciplina.getNomeDisciplina().contains(disciplina.getNomeDisciplina())
+						&& !disciplina.getCodigoCurso().isBlank()
+						&& ItemListaDeDisciplina.getCodigoCurso().contains(disciplina.getCodigoCurso())
+						&& !disciplina.getDiaSemana().equals("")
+						&& ItemListaDeDisciplina.getDiaSemana().contains(disciplina.getDiaSemana())
+						&& !disciplina.getCodigoDisciplina().isEmpty()
+						&& ItemListaDeDisciplina.getCodigoDisciplina().contains(disciplina.getCodigoDisciplina())) {
 					lblDisciplinaModoAlteracao.setVisible(true);
 					btnDisciplinaSalvarAlteracao.setVisible(true);
 					btnDisciplinaSalvarAlteracao.setEnabled(true);
-					taDisciplina.setText("Disciplina encontrada! Digite nos campos acima quais valores deseja alterar.\nOs campos que ficarem em branco não serão substituídos.");
+					taDisciplina.setText(
+							"Disciplina encontrada! Digite nos campos acima quais valores deseja alterar.\nOs campos que ficarem em branco não serão substituídos.");
 					return i;
 				}
 			}
@@ -464,7 +532,7 @@ public class DisciplinaController implements ActionListener {
 		if (!disciplina.getCodigoCurso().isBlank()) {
 			discEncontrada.setCodigoCurso(disciplina.getCodigoCurso());
 		}
-		if (!disciplina.getDiaSemana().isEmpty()) {
+		if (!disciplina.getDiaSemana().equals("")) {
 			discEncontrada.setDiaSemana(disciplina.getDiaSemana());
 		}
 

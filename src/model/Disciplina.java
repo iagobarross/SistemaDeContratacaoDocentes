@@ -29,6 +29,11 @@ public class Disciplina {
 		return codigoDisciplina + ";" + nomeDisciplina + ";" + diaSemana + ";" + horaInicial + ";" + horasDiarias + ";"
 				+ codigoCurso;
 	}
+	
+	public int hashCode() {
+		int posicao = Integer.parseInt(codigoProcesso) / 100;
+		return posicao;
+	}
 
 	public String getCodigoDisciplina() {
 		return codigoDisciplina;

@@ -1,8 +1,6 @@
 package view;
 
-import java.awt.EventQueue;
 import java.awt.Image;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -10,7 +8,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 
 public class TelaProcessos extends JFrame {
 
@@ -19,18 +16,6 @@ public class TelaProcessos extends JFrame {
 	
 	JPanel pnlLogo = new JPanel();
 	JLabel lblLogo = new JLabel();
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TelaProcessos frame = new TelaProcessos();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 
 	public TelaProcessos() {
@@ -62,12 +47,5 @@ public class TelaProcessos extends JFrame {
 		taProcessos.setEditable(false);
 		scrollPane.setViewportView(taProcessos);
 		
-		JButton btnProcessosListar = new JButton("Listar Processos");
-		btnProcessosListar.setBounds(10, 86, 157, 53);
-		contentPane.add(btnProcessosListar);
-		
-		JButton btnProcessosLimpar = new JButton("Limpar");
-		btnProcessosLimpar.setBounds(745, 124, 89, 23);
-		contentPane.add(btnProcessosLimpar);
 	}
 }

@@ -1,7 +1,5 @@
 package view;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -23,19 +21,6 @@ public class TelaInscritos extends JFrame {
 	
 	JPanel pnlLogo = new JPanel();
 	JLabel lblLogo = new JLabel();
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TelaInscritos frame = new TelaInscritos();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	public TelaInscritos() {
 		setTitle("Classificação de Inscritos");

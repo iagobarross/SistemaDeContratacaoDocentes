@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import br.edu.fateczl.Lista;
 import br.edu.fateczl.Fila.Fila;
 import model.Curso;
+import model.Disciplina;
 
 public class CursoController implements ActionListener {
 	private JTextField tfCursoCodigo;
@@ -44,16 +45,15 @@ public class CursoController implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
 		
-		// Cadastra o curso na lista de cursos e no Cursos.csv
 		if (cmd.equals("Cadastrar")) {
 			try {
 				limparTACurso();
-				cadastrarCurso();
+				validarRepetidas();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		}
-		// Busca o curso com base nos dados passados para a busca
+		
 		if (cmd.equals("Buscar")) {
 			try {
 				limparTACurso();
@@ -98,16 +98,33 @@ public class CursoController implements ActionListener {
 			}
 		}
 	}
-
-	private void cadastrarCurso() throws Exception {
-
-		// capturar os dados do windowbuilder e colocar na classe Curso
+private void validarRepetidas() throws Exception {
 		Curso curso = new Curso();
 		curso.setCodigoCurso(tfCursoCodigo.getText());
 		curso.setNomeCurso(tfCursoNome.getText());
 		curso.setAreaConhecimento((String) cbCursoAreaConhecimento.getSelectedItem());
+		Lista<Curso> todosOsCursos = new Lista<>();
 
-		if (!curso.getAreaConhecimento().equals(null) && !curso.getCodigoCurso().equals("")
+		todosOsCursos = alimentarLista("Cursos.csv", todosOsCursos);
+
+		int tamanho = todosOsCursos.size();
+
+		for (int i = 0; i < tamanho; i++) {
+			Curso c = new Curso();
+			c = todosOsCursos.get(i);
+			if (curso.getAreaConhecimento().equals(c.getAreaConhecimento()) && curso.getCodigoCurso().equals(c.getCodigoCurso())
+					&& curso.getNomeCurso().equals(c.getNomeCurso())) {
+				JOptionPane.showMessageDialog(null, "Este curso já está cadastrado no sistema.", "ERRO",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		cadastrarCurso(curso);
+	}
+
+	private void cadastrarCurso(Curso curso) throws Exception {
+
+		if (!curso.getAreaConhecimento().equals("") && !curso.getCodigoCurso().equals("")
 				&& !curso.getNomeCurso().equals("")) {
 			// adicionar o curso na lista de cursos
 			listaCursos.addLast(curso);
@@ -117,7 +134,7 @@ public class CursoController implements ActionListener {
 
 			// limpar os campos
 			limparCamposCurso();
-			taCurso.setText("Curso adicionado!.");
+			taCurso.setText("Curso adicionado!");
 
 		} else {
 			JOptionPane.showMessageDialog(null, "Todas as informações devem ser preenchidas para cadastrar um novo curso", "ERRO", JOptionPane.ERROR_MESSAGE);
@@ -136,7 +153,7 @@ public class CursoController implements ActionListener {
 			cursosEncontrados = searchCodigo(curso, cursosEncontrados);
 		} else if (!curso.getNomeCurso().isBlank()) {
 			cursosEncontrados = searchNome(curso, cursosEncontrados);
-		} else if (!curso.getAreaConhecimento().isEmpty()) {
+		} else if (!curso.getAreaConhecimento().equals("")) {
 			cursosEncontrados = searchArea(curso, cursosEncontrados);
 		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
@@ -244,12 +261,10 @@ public class CursoController implements ActionListener {
 		curso.setAreaConhecimento((String) cbCursoAreaConhecimento.getSelectedItem());
 		Lista<Curso> listagemDeCursos = new Lista<Curso>();
 
-		// Todo o arquivo csv é passado para uma lista
 		String path = System.getProperty("user.home") + File.separator + "Sistema de Contratação de Docentes";
 		File arq = new File(path, "Cursos.csv");
 		alimentarLista("Cursos.csv", listagemDeCursos);
 
-		// buscar o dado para ser removido na lista
 		int tamanhoAnterior = listagemDeCursos.size();
 		int tamanho = listagemDeCursos.size();
 		for (int i = 0; i < tamanho; i++) {
@@ -258,11 +273,13 @@ public class CursoController implements ActionListener {
 
 			if (!curso.getNomeCurso().isBlank() && cursoLista.getNomeCurso().contains(curso.getNomeCurso())
 					|| !curso.getCodigoCurso().isBlank() && cursoLista.getCodigoCurso().contains(curso.getCodigoCurso())
-					|| !curso.getAreaConhecimento().isEmpty()
+					|| !curso.getAreaConhecimento().equals("")
 							&& cursoLista.getAreaConhecimento().contains(curso.getAreaConhecimento())) {
 				listagemDeCursos.remove(i);
+				deletarDisciplinasDoCurso(cursoLista);
 				tamanho--;
-				JOptionPane.showMessageDialog(null, "Curso removido com sucesso!", "SUCESSO", JOptionPane.PLAIN_MESSAGE);
+				i--;
+				JOptionPane.showMessageDialog(null, "O curso e suas disciplinas atreladas foram removidos com sucesso!", "SUCESSO", JOptionPane.PLAIN_MESSAGE);
 
 			}
 		}
@@ -283,6 +300,33 @@ public class CursoController implements ActionListener {
 		}
 	}
 
+	private void deletarDisciplinasDoCurso(Curso curso) throws Exception {
+		Lista<Disciplina> todasAsDisciplinas = new Lista<Disciplina>();
+		DisciplinaController dc = new DisciplinaController();
+		todasAsDisciplinas = dc.alimentarLista("Disciplinas.csv", todasAsDisciplinas);
+		
+		int tamanho = todasAsDisciplinas.size();
+		
+		for(int i = 0 ; i < tamanho ;i ++) {
+			Disciplina d = new Disciplina();
+			d = todasAsDisciplinas.get(i);
+			if(curso.getCodigoCurso().equals(d.getCodigoCurso())) {
+				todasAsDisciplinas.remove(i);
+				tamanho--;
+				i--;
+			}
+		}
+		
+		metodosPrincipais.limparArquivo("Disciplinas.csv");
+
+		for (int i = 0; i < tamanho; i++) {
+			Disciplina discLista = new Disciplina();
+			discLista = todasAsDisciplinas.get(i);
+			metodosPrincipais.inserirNoArquivo(discLista.toString(), "Disciplinas.csv");
+		}
+				
+	}
+
 	private void limparTACurso() {
 		taCurso.setText("");
 	}
@@ -290,7 +334,7 @@ public class CursoController implements ActionListener {
 	private void limparCamposCurso() {
 		tfCursoCodigo.setText("");
 		tfCursoNome.setText("");
-		cbCursoAreaConhecimento.setSelectedItem(null);
+		cbCursoAreaConhecimento.setSelectedItem("");
 	}
 
 	private int atualizarCurso() throws Exception {
@@ -307,7 +351,7 @@ public class CursoController implements ActionListener {
 			searchCodigo(curso, cursosEncontrados);
 		} else if (!curso.getNomeCurso().isBlank()) {
 			searchNome(curso, cursosEncontrados);
-		} else if (!curso.getAreaConhecimento().isEmpty()) {
+		} else if (!curso.getAreaConhecimento().equals("")) {
 			searchArea(curso, cursosEncontrados);
 		} else {
 			JOptionPane.showMessageDialog(null, "Digite em um campo para pesquisar", "ERRO", JOptionPane.ERROR_MESSAGE);
@@ -329,7 +373,7 @@ public class CursoController implements ActionListener {
 				if (!curso.getNomeCurso().isBlank() && ItemListaDeCursos.getNomeCurso().contains(curso.getNomeCurso())
 						&& !curso.getCodigoCurso().isBlank()
 						&& ItemListaDeCursos.getCodigoCurso().contains(curso.getCodigoCurso())
-						&& !curso.getAreaConhecimento().isBlank()
+						&& !curso.getAreaConhecimento().equals("")
 						&& ItemListaDeCursos.getAreaConhecimento().contains(curso.getAreaConhecimento())) {
 					lblCursoModoAlteracao.setVisible(true);
 					btnCursoSalvarAlteracao.setVisible(true);
@@ -361,7 +405,7 @@ public class CursoController implements ActionListener {
 		if(!curso.getCodigoCurso().isBlank()) {
 			cursoEncontrado.setCodigoCurso(curso.getCodigoCurso());
 		}
-		if(!curso.getAreaConhecimento().isEmpty()) {
+		if(!curso.getAreaConhecimento().equals("")) {
 			cursoEncontrado.setAreaConhecimento(curso.getAreaConhecimento());
 		}
 		

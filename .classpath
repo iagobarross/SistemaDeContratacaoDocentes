@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="libs/Fila.jar"/>
 	<classpathentry kind="lib" path="libs/Lista.jar"/>
 	<classpathentry kind="lib" path="libs/Pilha.jar"/>
+	<classpathentry kind="lib" path="libs/QuickSort.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

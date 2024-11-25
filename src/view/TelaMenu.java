@@ -35,7 +35,7 @@ public class TelaMenu extends JFrame {
 
 	public TelaMenu() {
 		setTitle("Sistema de Contratação de Docentes");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 631, 359);
 		
 		contentPane = new JPanel();
